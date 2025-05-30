@@ -18,8 +18,8 @@ importers:
         specifier: latest
         version: 1.8.2(abitype@1.0.8(typescript@5.8.3)(zod@3.25.28))(typescript@5.8.3)(viem@2.29.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28))
       '@erc7824/nitrolite':
-        specifier: ^0.2.3
-        version: 0.2.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28)
+        specifier: 0.2.6
+        version: 0.2.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28)
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.56.4(react@19.1.0))
@@ -353,8 +353,8 @@ packages:
   '@emotion/unitless@0.8.1':
     resolution: {integrity: sha512-KOEGMu6dmJZtpadb476IsZBclKvILjopjUii3V+7MnXIQCYh8W3NgNcgwo21n9LXZX6EDIKvqfjYxXebDwxKmQ==}
 
-  '@erc7824/nitrolite@0.2.3':
-    resolution: {integrity: sha512-nVd3RTUKSxOtPpFTs+OcOUmIR5hdMx9MvXhynUBaWl7MfkwXoEO4PynvpUAQccJesCxJjaf846y72fWUwi4Q5g==}
+  '@erc7824/nitrolite@0.2.6':
+    resolution: {integrity: sha512-C6zm5Zdog+MXIiHnY9QfSNKCCair4UzZmLkGEz6tYt1uhw9H0GpFBt7NjSVeA7gxGryMfTZSL8tAFn1NPw8LVg==}
 
   '@ethereumjs/common@3.2.0':
     resolution: {integrity: sha512-pksvzI0VyLgmuEF2FA/JR/4/y6hcPq8OUail3/AvycBaW1d5VSauOZzqGvJ3RTmR4MU35lWE8KseKOsEhrFRBA==}
@@ -4678,7 +4678,7 @@ snapshots:
 
   '@emotion/unitless@0.8.1': {}
 
-  '@erc7824/nitrolite@0.2.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28)':
+  '@erc7824/nitrolite@0.2.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28)':
     dependencies:
       abitype: 0.10.3(typescript@5.8.3)(zod@3.25.28)
       viem: 2.29.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.28)
