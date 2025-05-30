@@ -12,9 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useNitroliteClient } from "@/hooks/useNitroliteClient";
-import { useClearNodeConnection } from "@/hooks/useClearNodeConnection";
-import { useChannelOperations } from "@/hooks/useChannelOperations";
+import { useNitroliteClient } from "@/hooks/use-nitrolite-client";
+import { useClearNodeConnection } from "@/hooks/use-clear-node-connection";
+import { useChannelOperations } from "@/hooks/use-channel-operations";
 import { ethers } from "ethers";
 
 export default function ERC7824TestPage() {
@@ -201,7 +201,10 @@ export default function ERC7824TestPage() {
               {accountInfo && (
                 <>
                   <p>Available: {formatBalance(accountInfo.available)} USDC</p>
-                  <p>Locked: {formatBalance(accountInfo.locked || 0n)} USDC</p>
+                  <p>
+                    Locked: {formatBalance(accountInfo.locked || BigInt(0))}{" "}
+                    USDC
+                  </p>
                 </>
               )}
             </div>
