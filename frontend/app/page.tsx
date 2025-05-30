@@ -5,24 +5,22 @@ import { FeatureSection } from "@/components/landing/feature-section";
 import { TeamSection } from "@/components/landing/team-section";
 import { ContactSection } from "@/components/landing/contact-section";
 import { Footer } from "@/components/layout/footer";
-import { WalletProvider } from "@/contexts/wallet-context";
+
 import { AppHeader } from "@/components/layout/app-header";
 
 export default function LandingPage() {
   return (
-    <WalletProvider>
-      <div className="min-h-screen">
-        <AppHeader />
-        <main>
-          <HeroSection />
-          <AboutYellow />
-          <ComparisonSection />
-          <FeatureSection />
-          <TeamSection />
-          <ContactSection />
-        </main>
-        <Footer />
-      </div>
-    </WalletProvider>
+    <div className="min-h-screen">
+      <AppHeader />
+      <main>
+        <HeroSection />
+        <AboutYellow />
+        <ComparisonSection />
+        <FeatureSection />
+        <TeamSection />
+        <ContactSection />
+      </main>
+      <Footer />
+    </div>
   );
 }
