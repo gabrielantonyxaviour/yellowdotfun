@@ -1,18 +1,18 @@
-import { LandingHeader } from "@/components/landing/landing-header";
 import { HeroSection } from "@/components/landing/hero-section";
-import { AboutYellow } from "@/components/home/about-yellow";
-import { ComparisonSection } from "@/components/home/comparison-section";
-import { FeatureSection } from "@/components/home/feature-section";
-import { TeamSection } from "@/components/home/team-section";
-import { ContactSection } from "@/components/home/contact-section";
+import { AboutYellow } from "@/components/landing/about-yellow";
+import { ComparisonSection } from "@/components/landing/comparison-section";
+import { FeatureSection } from "@/components/landing/feature-section";
+import { TeamSection } from "@/components/landing/team-section";
+import { ContactSection } from "@/components/landing/contact-section";
 import { Footer } from "@/components/layout/footer";
 import { WalletProvider } from "@/contexts/wallet-context";
+import { AppHeader } from "@/components/layout/app-header";
 
 export default function LandingPage() {
   return (
     <WalletProvider>
       <div className="min-h-screen">
-        <LandingHeader />
+        <AppHeader />
         <main>
           <HeroSection />
           <AboutYellow />
