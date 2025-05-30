@@ -27,10 +27,11 @@ export const useNitroliteClient = () => {
       setWalletAddress(address);
 
       const contractAddresses = {
-        custody: process.env.NEXT_PUBLIC_CUSTODY_ADDRESS!,
-        adjudicator: process.env.NEXT_PUBLIC_ADJUDICATOR_ADDRESS!,
-        guestAddress: process.env.NEXT_PUBLIC_GUEST_ADDRESS!,
-        tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS!,
+        custody: process.env.NEXT_PUBLIC_CUSTODY_ADDRESS! as `0x${string}`,
+        adjudicator: process.env
+          .NEXT_PUBLIC_ADJUDICATOR_ADDRESS! as `0x${string}`,
+        guestAddress: process.env.NEXT_PUBLIC_GUEST_ADDRESS! as `0x${string}`,
+        tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS! as `0x${string}`,
       };
 
       const publicClient = createPublicClient({
@@ -55,7 +56,9 @@ export const useNitroliteClient = () => {
         );
       }
 
-      const stateWalletAccount = privateKeyToAccount(stateWalletPrivateKey);
+      const stateWalletAccount = privateKeyToAccount(
+        stateWalletPrivateKey as `0x${string}`
+      );
       const stateWalletClient = {
         account: { address: stateWalletAccount.address },
         signMessage: async ({ message: { raw } }: any) => {
@@ -71,7 +74,7 @@ export const useNitroliteClient = () => {
         stateWalletClient,
         account: walletClient.account,
         chainId: sepolia.id,
-        challengeDuration: 86400,
+        challengeDuration: BigInt(86400),
         addresses: contractAddresses,
       });
 

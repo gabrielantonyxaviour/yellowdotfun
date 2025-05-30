@@ -16,6 +16,7 @@ import {
 import { usePrivy } from "@privy-io/react-auth";
 import { BalanceDropdown } from "./balance-dropdown";
 import { useMultiChainBalance } from "@/hooks/use-multichain-balance";
+import Image from "next/image";
 
 export function AppHeader() {
   const { authenticated, user, logout } = usePrivy();
@@ -26,6 +27,7 @@ export function AppHeader() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/home" className="flex items-center space-x-2">
+            <Image src="/logo.png" alt="yellow.fun" width={42} height={42} />
             <span className="text-2xl font-black yellow-text">yellow.fun</span>
           </Link>
 
