@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 56 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 56 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 56 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 56 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 56 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 56 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-200;
+  }
+}
+
+/* Custom styles */
+.yellow-border {
+  @apply border-2 border-black transition-colors duration-200;
+}
+
+.yellow-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.8);
+  transition: box-shadow 0.2s ease;
+}
+
+.dark .yellow-shadow {
+  box-shadow: 4px 4px 0px 0px rgba(255, 215, 0, 0.6);
+}
+
+.yellow-shadow-sm {
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.8);
+  transition: box-shadow 0.2s ease;
+}
+
+.dark .yellow-shadow-sm {
+  box-shadow: 2px 2px 0px 0px rgba(255, 215, 0, 0.6);
+}
+
+.yellow-text {
+  @apply font-black text-black transition-colors duration-200;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.dark .yellow-text {
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+.yellow-gradient {
+  background: linear-gradient(135deg, #ffdd00 0%, #ffd700 100%);
+}
+
+.yellow-button {
+  @apply bg-yellow-400 text-black font-bold yellow-border yellow-shadow transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg;
+}
+
+.yellow-card {
+  @apply bg-white dark:bg-card yellow-border yellow-shadow p-6 rounded-lg transition-colors duration-200;
+}
+
+.yellow-section {
+  @apply py-16 px-4;
+}
+
+.yellow-container {
+  @apply container mx-auto;
+}
+
+.yellow-heading {
+  @apply text-4xl md:text-5xl font-black mb-6 yellow-text;
+}
+
+.yellow-subheading {
+  @apply text-2xl font-bold mb-4;
+}
+
+/* Degen styles */
+.degen-card {
+  @apply bg-white dark:bg-card yellow-border yellow-shadow transition-all duration-200 hover:scale-[1.02] hover:shadow-lg;
+}
+
+.token-image {
+  @apply w-16 h-16 rounded-xl yellow-border bg-yellow-400 flex items-center justify-center text-2xl font-bold overflow-hidden transition-colors duration-200;
+}
+
+.king-of-hill {
+  @apply bg-yellow-400 text-black p-6 yellow-border yellow-shadow rounded-lg transition-colors duration-200;
+}
+
+.launch-btn {
+  @apply bg-yellow-400 text-black font-black text-xl px-10 py-4 yellow-border yellow-shadow transition-all duration-200 hover:translate-y-[-4px] hover:shadow-xl;
+}
+
+/* Navbar styles */
+header {
+  @apply bg-yellow-400 border-2 border-black border-t-0 border-l-0 border-r-0;
+}
+
+header nav a {
+  @apply text-black hover:text-yellow-800 transition-colors;
+}
+
+header .yellow-text {
+  @apply text-black;
+}
+
+/* Landing page specific styles */
+/* Dark mode overrides are handled by Tailwind's dark mode configuration */
