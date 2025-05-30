@@ -1,43 +1,77 @@
+// Updated TradingPanel component
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import type { Token } from "@/lib/types";
-import { usePrivy } from "@privy-io/react-auth";
+import { useTradingStore } from "@/lib/trading-store";
 import { formatNumber } from "@/lib/utils";
 import { Wallet } from "lucide-react";
 
 interface TradingPanelProps {
-  token: Token;
+  token: {
+    id: string;
+    name: string;
+    symbol: string;
+    price: number;
+  };
 }
 
 export function TradingPanel({ token }: TradingPanelProps) {
-  const { authenticated, login } = usePrivy();
+  const [userAddress] = useState(
+    () => "0x" + Math.random().toString(16).substr(2, 40)
+  );
   const [buyAmount, setBuyAmount] = useState("");
   const [sellAmount, setSellAmount] = useState("");
   const [slippage, setSlippage] = useState([1]);
 
-  const handleBuy = () => {
-    if (!authenticated) {
-      login();
-      return;
+  const {
+    buyToken,
+    sellToken,
+    getTokenPrice,
+    setUserBalance,
+    tokens,
+    userBalances,
+  } = useTradingStore();
+
+  const currentToken = tokens[token.id];
+  const currentPrice = getTokenPrice(token.id);
+  const userEthBalance = userBalances[userAddress] || 0;
+  const userTokenBalance = currentToken?.holders[userAddress] || 0;
+
+  // Initialize user with some ETH
+  useEffect(() => {
+    if (userEthBalance === 0) {
+      setUserBalance(userAddress, 1); // Give user 1 ETH to start
     }
-    // Trading logic would go here
-    console.log("Buy", buyAmount);
+  }, [userAddress, userEthBalance, setUserBalance]);
+
+  const handleBuy = () => {
+    const amount = parseFloat(buyAmount);
+    if (amount > 0) {
+      const success = buyToken(token.id, userAddress, amount);
+      if (success) {
+        setBuyAmount("");
+      } else {
+        alert("Insufficient ETH balance or invalid amount");
+      }
+    }
   };
 
   const handleSell = () => {
-    if (!authenticated) {
-      login();
-      return;
+    const amount = parseFloat(sellAmount);
+    if (amount > 0) {
+      const success = sellToken(token.id, userAddress, amount);
+      if (success) {
+        setSellAmount("");
+      } else {
+        alert("Insufficient token balance or invalid amount");
+      }
     }
-    // Trading logic would go here
-    console.log("Sell", sellAmount);
   };
 
   return (
@@ -46,101 +80,105 @@ export function TradingPanel({ token }: TradingPanelProps) {
         Trade ${token.symbol}
       </h2>
 
-      {!authenticated ? (
-        <div className="text-center py-8">
-          <Wallet className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <p className="font-medium mb-4">
-            Connect your wallet to start trading
-          </p>
+      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+        <p className="text-sm font-medium">Your Balance</p>
+        <p className="font-bold">{formatNumber(userEthBalance)} ETH</p>
+        <p className="font-bold">
+          {formatNumber(userTokenBalance)} {token.symbol}
+        </p>
+      </div>
+
+      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+        <p className="text-sm font-medium">Current Price</p>
+        <p className="text-xl font-bold">${formatNumber(currentPrice)}</p>
+      </div>
+
+      <Tabs defaultValue="buy" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 cartoon-border">
+          <TabsTrigger value="buy" className="font-bold">
+            Buy
+          </TabsTrigger>
+          <TabsTrigger value="sell" className="font-bold">
+            Sell
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="buy" className="space-y-4">
+          <div>
+            <Label htmlFor="buy-amount" className="font-bold">
+              Amount (ETH)
+            </Label>
+            <Input
+              id="buy-amount"
+              type="number"
+              placeholder="0.00"
+              value={buyAmount}
+              onChange={(e) => setBuyAmount(e.target.value)}
+              className="cartoon-border font-bold text-lg"
+              max={userEthBalance}
+              step="0.001"
+            />
+          </div>
+
+          <div>
+            <Label className="font-bold">You'll receive (approx)</Label>
+            <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
+              <p className="text-lg font-bold">
+                {buyAmount && currentPrice > 0
+                  ? formatNumber(parseFloat(buyAmount) / currentPrice)
+                  : "0"}{" "}
+                {token.symbol}
+              </p>
+            </div>
+          </div>
+
           <Button
-            onClick={() => login()}
-            className="cartoon-border cartoon-shadow bg-yellow-400 hover:bg-yellow-300 text-black font-bold"
+            onClick={handleBuy}
+            disabled={!buyAmount || parseFloat(buyAmount) > userEthBalance}
+            className="w-full cartoon-border cartoon-shadow bg-green-500 hover:bg-green-400 text-white font-bold text-lg py-6"
           >
-            Connect Wallet
+            Buy {token.symbol}
           </Button>
-        </div>
-      ) : (
-        <Tabs defaultValue="buy" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 cartoon-border">
-            <TabsTrigger value="buy" className="font-bold">
-              Buy
-            </TabsTrigger>
-            <TabsTrigger value="sell" className="font-bold">
-              Sell
-            </TabsTrigger>
-          </TabsList>
+        </TabsContent>
 
-          <TabsContent value="buy" className="space-y-4">
-            <div>
-              <Label htmlFor="buy-amount" className="font-bold">
-                Amount (USD)
-              </Label>
-              <Input
-                id="buy-amount"
-                type="number"
-                placeholder="0.00"
-                value={buyAmount}
-                onChange={(e) => setBuyAmount(e.target.value)}
-                className="cartoon-border font-bold text-lg"
-              />
+        <TabsContent value="sell" className="space-y-4">
+          <div>
+            <Label htmlFor="sell-amount" className="font-bold">
+              Amount ({token.symbol})
+            </Label>
+            <Input
+              id="sell-amount"
+              type="number"
+              placeholder="0.00"
+              value={sellAmount}
+              onChange={(e) => setSellAmount(e.target.value)}
+              className="cartoon-border font-bold text-lg"
+              max={userTokenBalance}
+              step="0.000001"
+            />
+          </div>
+
+          <div>
+            <Label className="font-bold">You'll receive (approx)</Label>
+            <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
+              <p className="text-lg font-bold">
+                {sellAmount && currentPrice > 0
+                  ? formatNumber(parseFloat(sellAmount) * currentPrice)
+                  : "0"}{" "}
+                ETH
+              </p>
             </div>
+          </div>
 
-            <div>
-              <Label className="font-bold">You'll receive</Label>
-              <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
-                <p className="text-lg font-bold">
-                  {buyAmount
-                    ? formatNumber(Number(buyAmount) / token.price)
-                    : "0"}{" "}
-                  {token.symbol}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleBuy}
-              className="w-full cartoon-border cartoon-shadow bg-green-500 hover:bg-green-400 text-white font-bold text-lg py-6"
-            >
-              Buy {token.symbol}
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="sell" className="space-y-4">
-            <div>
-              <Label htmlFor="sell-amount" className="font-bold">
-                Amount ({token.symbol})
-              </Label>
-              <Input
-                id="sell-amount"
-                type="number"
-                placeholder="0.00"
-                value={sellAmount}
-                onChange={(e) => setSellAmount(e.target.value)}
-                className="cartoon-border font-bold text-lg"
-              />
-            </div>
-
-            <div>
-              <Label className="font-bold">You'll receive</Label>
-              <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
-                <p className="text-lg font-bold">
-                  $
-                  {sellAmount
-                    ? formatNumber(Number(sellAmount) * token.price)
-                    : "0"}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleSell}
-              className="w-full cartoon-border cartoon-shadow bg-red-500 hover:bg-red-400 text-white font-bold text-lg py-6"
-            >
-              Sell {token.symbol}
-            </Button>
-          </TabsContent>
-        </Tabs>
-      )}
+          <Button
+            onClick={handleSell}
+            disabled={!sellAmount || parseFloat(sellAmount) > userTokenBalance}
+            className="w-full cartoon-border cartoon-shadow bg-red-500 hover:bg-red-400 text-white font-bold text-lg py-6"
+          >
+            Sell {token.symbol}
+          </Button>
+        </TabsContent>
+      </Tabs>
 
       <div className="mt-6 pt-6 border-t-2 border-black">
         <div className="flex justify-between items-center mb-2">

@@ -46,6 +46,7 @@
     "@solana/spl-token": "latest",
     "@solana/web3.js": "latest",
     "@tanstack/react-query": "latest",
+    "@worldcoin/minikit-react": "^1.9.5",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -72,7 +73,8 @@
     "viem": "2.29.3",
     "wagmi": "latest",
     "ws": "^8.18.2",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@types/node": "^22",

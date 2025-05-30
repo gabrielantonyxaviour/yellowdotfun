@@ -1,6 +1,7 @@
+// Updated TokenDetail component to properly initialize the token
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TradingChart } from "@/components/token-detail/trading-chart";
@@ -11,6 +12,8 @@ import { TokenTransactions } from "@/components/token-detail/token-transactions"
 import Image from "next/image";
 import { formatNumber, formatPercentage } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useTradingStore } from "@/lib/trading-store";
+import { tradingSimulator } from "@/lib/trading-simulator";
 
 // Mock token data
 const mockToken = {
@@ -26,8 +29,8 @@ const mockToken = {
   holders: 1234,
   rank: 1,
   createdAt: new Date().toISOString(),
-  creatorAddress: "0x1234...5678",
-  contractAddress: "0xabcd...efgh",
+  creatorAddress: "0x1234567890123456789012345678901234567890",
+  contractAddress: "0xabcdefghijklmnopqrstuvwxyz1234567890abcdef",
   chainId: 1,
 };
 
@@ -37,8 +40,54 @@ interface TokenDetailProps {
 
 export function TokenDetail({ tokenId }: TokenDetailProps) {
   const [activeTab, setActiveTab] = useState("holders");
-  const token = mockToken;
-  const isPositive = token.priceChange24h >= 0;
+
+  // Subscribe to token updates
+  const token = useTradingStore((state) => state.tokens[tokenId]);
+  const { createToken, getTokenPrice } = useTradingStore();
+
+  const currentPrice = token ? getTokenPrice(tokenId) : 0;
+  const isPositive = currentPrice > 0.0234; // Compare with initial price
+
+  // Initialize token and start simulation
+  useEffect(() => {
+    if (!token) {
+      // Create the token with proper bonding curve parameters
+      const newTokenId = createToken({
+        name: mockToken.name,
+        symbol: mockToken.symbol,
+        description: mockToken.description,
+        totalSupply: 1000000000, // 1B tokens
+        virtualCollateral: 30, // 30 ETH initial virtual reserves
+        virtualTokenSupply: 1000000000, // 1B virtual token supply
+        realCollateral: 0,
+        creatorAddress: mockToken.creatorAddress,
+      });
+
+      console.log("Created token:", newTokenId);
+    }
+
+    // Start simulation after a short delay to ensure token exists
+    const timer = setTimeout(() => {
+      console.log("Starting simulation for token:", tokenId);
+      tradingSimulator.start([tokenId]);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      tradingSimulator.stop();
+    };
+  }, [tokenId, token, createToken]);
+
+  // Show loading state if token isn't created yet
+  if (!token) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <p>Initializing token...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -58,7 +107,7 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
           <p className="text-lg font-bold text-gray-600">${token.symbol}</p>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-black">${formatNumber(token.price)}</p>
+          <p className="text-2xl font-black">${formatNumber(currentPrice)}</p>
           <p
             className={`text-lg font-bold flex items-center justify-end gap-1 ${
               isPositive ? "text-green-600" : "text-red-600"
@@ -69,7 +118,7 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
             ) : (
               <TrendingDown className="h-5 w-5" />
             )}
-            {formatPercentage(token.priceChange24h)}
+            {formatPercentage(isPositive ? 15.5 : -8.2)}
           </p>
         </div>
       </div>
@@ -86,10 +135,10 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="w-full yellow-border border-b-0 rounded-b-none">
                 <TabsTrigger value="holders" className="flex-1 font-bold">
-                  Holders
+                  Holders ({Object.keys(token.holders).length})
                 </TabsTrigger>
                 <TabsTrigger value="transactions" className="flex-1 font-bold">
-                  Transactions
+                  Transactions ({token.transactions.length})
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="holders" className="p-4">
@@ -105,7 +154,23 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
           <Card className="yellow-border yellow-shadow bg-card p-6">
             <h2 className="text-xl font-black mb-4">About {token.name}</h2>
             <p className="text-gray-600 mb-6">{token.description}</p>
-            <TokenInfo token={token} />
+            <TokenInfo
+              token={{
+                id: token.id,
+                name: token.name,
+                symbol: token.symbol,
+                description: token.description,
+                price: currentPrice,
+                priceChange24h: isPositive ? 15.5 : -8.2,
+                marketCap:
+                  currentPrice * (token.totalSupply - token.virtualTokenSupply),
+                volume24h: token.transactions
+                  .slice(0, 24)
+                  .reduce((sum, tx) => sum + tx.ethAmount, 0),
+                holders: Object.keys(token.holders).length,
+                rank: 1,
+              }}
+            />
           </Card>
 
           {/* Comments Section */}
@@ -118,7 +183,14 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
         </div>
 
         <div className="space-y-6">
-          <TradingPanel token={token} />
+          <TradingPanel
+            token={{
+              id: token.id,
+              name: token.name,
+              symbol: token.symbol,
+              price: currentPrice,
+            }}
+          />
         </div>
       </div>
     </div>

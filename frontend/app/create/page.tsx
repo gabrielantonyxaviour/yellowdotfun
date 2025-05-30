@@ -4,18 +4,14 @@ import { Footer } from "@/components/layout/footer";
 
 export default function CreateTokenPage() {
   return (
-    <div className="min-h-screen">
-      <AppHeader />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-black yellow-text mb-8">
-          Create Your Memecoin
-        </h1>
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-black yellow-text mb-8">
+        Create Your Memecoin
+      </h1>
 
-        <div className="max-w-3xl mx-auto">
-          <CreateTokenForm />
-        </div>
-      </main>
-      <Footer />
-    </div>
+      <div className="max-w-3xl mx-auto">
+        <CreateTokenForm />
+      </div>
+    </main>
   );
 }

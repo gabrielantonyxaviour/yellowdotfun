@@ -1,8 +1,11 @@
-"use client"
+"use client";
 
-import { TokenCard } from "@/components/tokens/token-card"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
+"use client";
+
+import { TokenCard } from "@/components/tokens/token-card";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Dummy data
 const dummyTokens = [
@@ -78,74 +81,70 @@ const dummyTokens = [
     marketCap: 780000,
     volume24h: 345000,
   },
-]
+];
 
 export function TokensGrid() {
-  const [visibleTokens, setVisibleTokens] = useState(8)
-  const [activeFilter, setActiveFilter] = useState("all")
+  const [visibleTokens, setVisibleTokens] = useState(6);
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const filters = [
+    { id: "all", label: "All", emoji: "🔥" },
+    { id: "trending", label: "Trending", emoji: "📈" },
+    { id: "new", label: "New", emoji: "🆕" },
+    { id: "gainers", label: "Gainers", emoji: "🚀" },
+    { id: "losers", label: "Losers", emoji: "📉" },
+  ];
 
   const loadMore = () => {
-    setVisibleTokens((prev) => prev + 8)
-  }
+    setVisibleTokens((prev) => prev + 6);
+  };
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-6">
-        <Button
-          variant="outline"
-          size="sm"
-          className={`yellow-border ${activeFilter === "all" ? "bg-yellow-400 text-black" : ""}`}
-          onClick={() => setActiveFilter("all")}
-        >
-          All
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`yellow-border ${activeFilter === "trending" ? "bg-yellow-400 text-black" : ""}`}
-          onClick={() => setActiveFilter("trending")}
-        >
-          Trending
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`yellow-border ${activeFilter === "new" ? "bg-yellow-400 text-black" : ""}`}
-          onClick={() => setActiveFilter("new")}
-        >
-          New
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`yellow-border ${activeFilter === "gainers" ? "bg-yellow-400 text-black" : ""}`}
-          onClick={() => setActiveFilter("gainers")}
-        >
-          Top Gainers
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`yellow-border ${activeFilter === "losers" ? "bg-yellow-400 text-black" : ""}`}
-          onClick={() => setActiveFilter("losers")}
-        >
-          Top Losers
-        </Button>
-      </div>
+    <div className="space-y-4">
+      {/* Filter Pills */}
+      <ScrollArea className="w-full whitespace-nowrap">
+        <div className="flex gap-2 pb-2">
+          {filters.map((filter) => (
+            <Button
+              key={filter.id}
+              variant="outline"
+              size="sm"
+              className={`
+                rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap
+                ${
+                  activeFilter === filter.id
+                    ? "bg-yellow-400 text-black border-black"
+                    : "bg-white border-gray-300 text-gray-700"
+                }
+              `}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              <span className="mr-1">{filter.emoji}</span>
+              {filter.label}
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Tokens Grid */}
+      <div className="grid grid-cols-1 gap-3">
         {dummyTokens.slice(0, visibleTokens).map((token) => (
           <TokenCard key={token.id} token={token} />
         ))}
       </div>
 
+      {/* Load More */}
       {visibleTokens < dummyTokens.length && (
-        <div className="flex justify-center">
-          <Button onClick={loadMore} className="yellow-button">
+        <div className="pt-4">
+          <Button
+            onClick={loadMore}
+            variant="outline"
+            className="w-full py-3 rounded-xl border-2 border-gray-300 bg-white font-bold"
+          >
             Load More
           </Button>
         </div>
       )}
     </div>
-  )
+  );
 }

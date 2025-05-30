@@ -1,32 +1,31 @@
-"use client"
+// hooks/use-holders.ts
+"use client";
 
-import { useState, useEffect } from "react"
-import { useToken } from "@privy-io/react-auth"
-import { fetchWithAuth } from "@/lib/api/fetch-with-auth"
-import type { Holder } from "@/lib/types"
+import { useTradingStore } from "@/lib/trading-store";
 
 export function useHolders(tokenId: string) {
-  const { getAccessToken } = useToken()
-  const [holders, setHolders] = useState<Holder[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  // Subscribe to the specific token's holders
+  const token = useTradingStore((state) => state.tokens[tokenId]);
 
-  useEffect(() => {
-    async function fetchHolders() {
-      try {
-        const response = await fetchWithAuth(getAccessToken, `/api/tokens/${tokenId}/holders`)
-        if (response.ok) {
-          const data = await response.json()
-          setHolders(data.holders)
-        }
-      } catch (error) {
-        console.error("Failed to fetch holders:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  const holders = token
+    ? Object.entries(token.holders)
+        .map(([address, balance]) => {
+          const totalSupply = Object.values(token.holders).reduce(
+            (sum, bal) => sum + bal,
+            0
+          );
+          return {
+            address,
+            balance,
+            percentage: totalSupply > 0 ? (balance / totalSupply) * 100 : 0,
+          };
+        })
+        .sort((a, b) => b.balance - a.balance)
+        .slice(0, 50)
+    : [];
 
-    fetchHolders()
-  }, [tokenId, getAccessToken])
-
-  return { holders, isLoading }
+  return {
+    holders,
+    isLoading: false,
+  };
 }

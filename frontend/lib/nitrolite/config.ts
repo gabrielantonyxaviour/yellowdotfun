@@ -19,5 +19,5 @@ export const NITROLITE_CONFIG = {
 
   // Chain config
   chainId: 545, // Flow Testnet
-  challengeDuration: BigInt(100),
+  challengeDuration: BigInt(3600),
 };

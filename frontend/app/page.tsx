@@ -10,17 +10,13 @@ import { AppHeader } from "@/components/layout/app-header";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
-      <AppHeader />
-      <main>
-        <HeroSection />
-        <AboutYellow />
-        <ComparisonSection />
-        <FeatureSection />
-        <TeamSection />
-        <ContactSection />
-      </main>
-      <Footer />
-    </div>
+    <main>
+      <HeroSection />
+      <AboutYellow />
+      <ComparisonSection />
+      <FeatureSection />
+      <TeamSection />
+      <ContactSection />
+    </main>
   );
 }
