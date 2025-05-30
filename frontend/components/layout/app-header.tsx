@@ -19,7 +19,7 @@ import { useMultiChainBalance } from "@/hooks/use-multichain-balance";
 import Image from "next/image";
 
 export function AppHeader() {
-  const { authenticated, user, logout } = usePrivy();
+  const { authenticated, user, logout, login } = usePrivy();
   const { balances, totalUsd } = useMultiChainBalance();
 
   return (
@@ -73,7 +73,7 @@ export function AppHeader() {
             ) : (
               <Button
                 onClick={() => {
-                  /* implement connect */
+                  login();
                 }}
                 className="yellow-button"
               >

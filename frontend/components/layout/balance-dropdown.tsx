@@ -31,7 +31,7 @@ const CHAIN_INFO: Record<
   43114: { name: "Avalanche", logo: "avax.png", symbol: "AVAX" },
   56: { name: "BSC", logo: "bsc.png", symbol: "BNB" },
   8453: { name: "Base", logo: "base.png", symbol: "ETH" },
-  11155111: { name: "Base Sepolia", logo: "base.png", symbol: "ETH" },
+  11155111: { name: "Sepolia", logo: "eth.png", symbol: "ETH" },
   80002: { name: "Polygon Mumbai", logo: "pol.png", symbol: "MATIC" },
   43113: { name: "Avalanche Fuji", logo: "avax.png", symbol: "AVAX" },
   97: { name: "BSC Testnet", logo: "bsc.png", symbol: "BNB" },
