@@ -1,6 +1,4 @@
-import { AppHeader } from "@/components/layout/app-header";
 import { CreateTokenForm } from "@/components/create/create-token-form";
-import { Footer } from "@/components/layout/footer";
 
 export default function CreateTokenPage() {
   return (

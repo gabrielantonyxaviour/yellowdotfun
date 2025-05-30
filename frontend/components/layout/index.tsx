@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen">
       <AppHeader />
       {children}
-      <Footer />
+      {JSON.parse(process.env.NEXT_PUBLIC_IS_BROWSER || "false") && <Footer />}
     </div>
   );
 }
