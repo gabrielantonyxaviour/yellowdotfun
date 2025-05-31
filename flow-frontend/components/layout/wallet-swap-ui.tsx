@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { ChevronDown } from "lucide-react";
 import { formatEther, parseEther } from "viem";
-import { publicClient } from "@/lib/constants";
+import { isTesting, publicClient } from "@/lib/constants";
 
 interface TokenBalance {
   symbol: string;
@@ -13,18 +13,25 @@ interface TokenBalance {
 interface TokenPrices {
   FLOW: number;
   USD: number;
+  WORLD: number;
 }
 
 export function WalletSwapUI({ balance }: { balance: number }) {
   const { address } = useAccount();
-  const [fromToken, setFromToken] = useState<"USD" | "FLOW">("USD");
-  const [toToken, setToToken] = useState<"USD" | "FLOW">("FLOW");
+  const [fromToken, setFromToken] = useState<"USD" | "FLOW" | "WORLD">("USD");
+  const [toToken, setToToken] = useState<"USD" | "FLOW" | "WORLD">(
+    isTesting ? "WORLD" : "FLOW"
+  );
   const [amount, setAmount] = useState("");
   const [toAmount, setToAmount] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
-  const [prices, setPrices] = useState<TokenPrices>({ FLOW: 0, USD: 1 });
+  const [prices, setPrices] = useState<TokenPrices>({
+    FLOW: 0,
+    USD: 1,
+    WORLD: 0,
+  });
   const [priceLoading, setPriceLoading] = useState(true);
-  const [flowBalance, setFlowBalance] = useState<string>("0");
+  const [nativeBalance, setNativeBalance] = useState<string>("0");
 
   useEffect(() => {
     if (!address) return;
@@ -32,8 +39,8 @@ export function WalletSwapUI({ balance }: { balance: number }) {
       const data = await publicClient.getBalance({
         address: address,
       });
-
-      setFlowBalance(parseFloat(formatEther(data)).toFixed(2));
+      console.log(parseFloat(formatEther(data)));
+      setNativeBalance(parseFloat(formatEther(data)).toFixed(4));
     })();
   }, [address]);
 
@@ -46,17 +53,24 @@ export function WalletSwapUI({ balance }: { balance: number }) {
       symbol: "FLOW",
       icon: "/flow.png",
     },
+    WORLD: {
+      symbol: "ETH",
+      icon: "/world.png",
+    },
   };
 
   // Fetch token prices on mount
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await fetch("/api/token-price?token=FLOW");
+        const response = await fetch(
+          "/api/token-price?token=" + (isTesting ? "ETH" : "FLOW")
+        );
         const data = await response.json();
         setPrices({
           FLOW: data.FLOW?.usd || 0,
           USD: 1,
+          WORLD: data.ETH?.usd || 0,
         });
       } catch (error) {
         console.error("Failed to fetch prices:", error);
@@ -94,7 +108,8 @@ export function WalletSwapUI({ balance }: { balance: number }) {
 
   const hasInsufficientBalance = () => {
     if (!amount) return false;
-    const fromBalance = fromToken === "USD" ? balance : parseFloat(flowBalance);
+    const fromBalance =
+      fromToken === "USD" ? balance : parseFloat(nativeBalance);
     const inputAmount = parseFloat(amount);
     return inputAmount > fromBalance;
   };
@@ -133,7 +148,7 @@ export function WalletSwapUI({ balance }: { balance: number }) {
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-stone-400">From</span>
           <span className="text-xs text-stone-400">
-            Balance: {fromToken === "USD" ? balance : parseFloat(flowBalance)}
+            Balance: {fromToken === "USD" ? balance : parseFloat(nativeBalance)}
           </span>
         </div>
         <div className="flex items-center justify-between">
@@ -176,7 +191,7 @@ export function WalletSwapUI({ balance }: { balance: number }) {
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-stone-400">To</span>
           <span className="text-xs text-stone-400">
-            Balance: {toToken === "USD" ? balance : parseFloat(flowBalance)}
+            Balance: {toToken === "USD" ? balance : parseFloat(nativeBalance)}
           </span>
         </div>
         <div className="flex items-center justify-between">

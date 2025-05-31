@@ -1,14 +1,15 @@
 import { createConfig } from "@privy-io/wagmi";
 import { http } from "viem";
-import { worldchain, worldchainSepolia } from "viem/chains";
+import { flowMainnet, worldchain } from "viem/chains";
+import { isTesting } from "@/lib/constants";
 
 export const config = createConfig({
-  chains: [worldchain, worldchainSepolia],
+  chains: isTesting ? [worldchain] : [flowMainnet],
   transports: {
-    [worldchainSepolia.id]: http(
+    [worldchain.id]: http(
       `https://worldchain-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
     ),
-    [worldchain.id]: http(
+    [flowMainnet.id]: http(
       `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
     ),
   },

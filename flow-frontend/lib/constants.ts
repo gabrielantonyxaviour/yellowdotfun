@@ -1,14 +1,16 @@
 import { createPublicClient, createWalletClient, custom, http } from "viem";
-import { flowMainnet, flowTestnet } from "viem/chains";
+import { flowMainnet, worldchain } from "viem/chains";
 
-export const isMainnet = process.env.NEXT_PUBLIC_USE_MAINNET === "true";
+export const isTesting = JSON.parse(
+  process.env.NEXT_PUBLIC_TESTING_CHAIN || "false"
+);
 
 export const publicClient = createPublicClient({
-  chain: isMainnet ? flowMainnet : flowTestnet,
+  chain: isTesting ? worldchain : flowMainnet,
   transport: http(),
 });
 
 export const walletClient = createWalletClient({
-  chain: isMainnet ? flowMainnet : flowTestnet,
+  chain: isTesting ? worldchain : flowMainnet,
   transport: custom(window.ethereum),
 });

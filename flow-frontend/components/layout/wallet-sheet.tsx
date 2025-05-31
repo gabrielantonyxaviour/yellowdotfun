@@ -12,7 +12,7 @@ export default function WalletSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="flex items-center space-x-1 border border-stone-600 rounded-lg px-2 py-1 hover:bg-stone-700 active:bg-stone-600">
+        <button className="flex items-center space-x-1 border border-stone-600 rounded-lg px-2 py-1 hover:bg-yellow-400 active:bg-yellow-600">
           <Image src="/usd.png" alt="USD" width={16} height={16} />
           <span className="text-sm font-bold text-black">
             {balance.toLocaleString()}
