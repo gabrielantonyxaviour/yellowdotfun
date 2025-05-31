@@ -21,10 +21,10 @@ export function KingOfHill() {
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3 px-1">
         <Crown className="h-5 w-5 text-yellow-600" />
-        <h2 className="text-lg font-black text-black">King of the Hill</h2>
+        <h2 className="text-lg font-semibold text-white">King of the Hill</h2>
       </div>
 
-      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl p-4 border-2 border-black shadow-lg">
+      <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 rounded-2xl p-4 border-2 border-stone-600 shadow-lg">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-black">
             <Image
@@ -55,14 +55,14 @@ export function KingOfHill() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-black/10 rounded-lg p-2">
-            <p className="text-xs font-medium text-black/70">Market Cap</p>
+          <div className="bg-black/20 rounded-lg p-2">
+            <p className="text-xs font-medium text-black/80">Market Cap</p>
             <p className="text-sm font-bold text-black">
               ${formatNumber(kingToken.marketCap)}
             </p>
           </div>
-          <div className="bg-black/10 rounded-lg p-2">
-            <p className="text-xs font-medium text-black/70">Volume 24h</p>
+          <div className="bg-black/20 rounded-lg p-2">
+            <p className="text-xs font-medium text-black/80">Volume 24h</p>
             <p className="text-sm font-bold text-black">
               ${formatNumber(kingToken.volume24h)}
             </p>

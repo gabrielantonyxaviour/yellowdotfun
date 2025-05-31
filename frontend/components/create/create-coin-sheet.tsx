@@ -11,6 +11,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Upload,
@@ -21,6 +22,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle,
+  Plus,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -83,6 +85,14 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger>
+        <Button
+          className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 rounded-xl p-3"
+          onClick={() => onOpenChange(true)}
+        >
+          <Plus className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
       <SheetContent
         side="bottom"
         className="h-[90vh] rounded-t-3xl border-t-2 border-stone-700 bg-stone-900"
@@ -196,7 +206,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
 
               <Button
                 onClick={nextStep}
-                className="w-full yellow-button py-4 text-lg font-bold rounded-xl"
+                className="w-full yellow-button py-4 text-lg font-semibold text-sm rounded-xl"
                 disabled={!isStep1Valid}
               >
                 Next Step
@@ -248,7 +258,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="flex-1 yellow-button py-4 font-bold rounded-xl"
+                  className="flex-1 yellow-button py-4 font-semibold text-sm rounded-xl"
                   disabled={!isStep2Valid}
                 >
                   Next Step
@@ -328,7 +338,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="flex-1 yellow-button py-4 font-bold rounded-xl"
+                  className="flex-1 yellow-button py-4 font-semibold text-sm rounded-xl"
                 >
                   Next Step
                   <ArrowRight className="ml-2 h-5 w-5" />

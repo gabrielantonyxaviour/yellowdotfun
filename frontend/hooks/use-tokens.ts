@@ -1,84 +1,79 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useToken as usePrivyToken } from "@privy-io/react-auth"
-import { fetchWithAuth } from "@/lib/api/fetch-with-auth"
-import type { Token } from "@/lib/types"
+import { useState, useEffect } from "react";
+import type { Token } from "@/lib/types";
 
 export function useTrendingTokens() {
-  const { getAccessToken } = usePrivyToken()
-  const [tokens, setTokens] = useState<Token[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchTokens() {
       try {
-        const response = await fetchWithAuth(getAccessToken, "/api/tokens/trending")
+        const response = await fetch("/api/tokens/trending");
         if (response.ok) {
-          const data = await response.json()
-          setTokens(data.tokens)
+          const data = await response.json();
+          setTokens(data.tokens);
         }
       } catch (error) {
-        console.error("Failed to fetch trending tokens:", error)
+        console.error("Failed to fetch trending tokens:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchTokens()
-  }, [getAccessToken])
+    fetchTokens();
+  }, []);
 
-  return { tokens, isLoading }
+  return { tokens, isLoading };
 }
 
 export function useRecentTokens() {
-  const { getAccessToken } = usePrivyToken()
-  const [tokens, setTokens] = useState<Token[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchTokens() {
       try {
-        const response = await fetchWithAuth(getAccessToken, "/api/tokens/recent")
+        const response = await fetch("/api/tokens/recent");
         if (response.ok) {
-          const data = await response.json()
-          setTokens(data.tokens)
+          const data = await response.json();
+          setTokens(data.tokens);
         }
       } catch (error) {
-        console.error("Failed to fetch recent tokens:", error)
+        console.error("Failed to fetch recent tokens:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchTokens()
-  }, [getAccessToken])
+    fetchTokens();
+  }, []);
 
-  return { tokens, isLoading }
+  return { tokens, isLoading };
 }
 
 export function useToken(tokenId: string) {
-  const { getAccessToken } = usePrivyToken()
-  const [token, setToken] = useState<Token | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [token, setToken] = useState<Token | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchToken() {
       try {
-        const response = await fetchWithAuth(getAccessToken, `/api/tokens/${tokenId}`)
+        const response = await fetch(`/api/tokens/${tokenId}`);
         if (response.ok) {
-          const data = await response.json()
-          setToken(data.token)
+          const data = await response.json();
+          setToken(data.token);
         }
       } catch (error) {
-        console.error("Failed to fetch token:", error)
+        console.error("Failed to fetch token:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchToken()
-  }, [tokenId, getAccessToken])
+    fetchToken();
+  }, [tokenId]);
 
-  return { token, isLoading }
+  return { token, isLoading };
 }

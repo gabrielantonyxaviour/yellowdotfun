@@ -110,13 +110,13 @@ export function TokensGrid() {
               variant="outline"
               size="sm"
               className={`
-                rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap
-                ${
-                  activeFilter === filter.id
-                    ? "bg-yellow-400 text-black border-black"
-                    : "bg-white border-gray-300 text-gray-700"
-                }
-              `}
+        rounded-full px-4 py-2 text-sm font-bold whitespace-nowrap
+        ${
+          activeFilter === filter.id
+            ? "bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 text-black border-black"
+            : "bg-stone-800 border-stone-600 text-stone-300 hover:bg-stone-700"
+        }
+      `}
               onClick={() => setActiveFilter(filter.id)}
             >
               <span className="mr-1">{filter.emoji}</span>
@@ -139,7 +139,7 @@ export function TokensGrid() {
           <Button
             onClick={loadMore}
             variant="outline"
-            className="w-full py-3 rounded-xl border-2 border-gray-300 bg-white font-bold"
+            className="w-full py-3 rounded-xl border-2 border-stone-600 bg-stone-800 font-bold text-white hover:bg-stone-700"
           >
             Load More
           </Button>
