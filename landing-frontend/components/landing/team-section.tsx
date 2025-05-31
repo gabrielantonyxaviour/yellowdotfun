@@ -7,7 +7,7 @@ import { useState } from "react";
 export function TeamSection() {
   const [showPrague, setShowPrague] = useState(false);
   return (
-    <section className="bg-yellow-400 yellow-section">
+    <section className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 yellow-section">
       <div className="yellow-container">
         <div className="text-center mb-12">
           <h2 className="yellow-heading">Meet the Team</h2>
@@ -68,7 +68,15 @@ export function TeamSection() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2">
+                    <div
+                      className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2 cursor-pointer"
+                      onClick={() => {
+                        window.open(
+                          "https://ethglobal.com/showcase/atestamint-xi8ch",
+                          "_blank"
+                        );
+                      }}
+                    >
                       <Image
                         src="/superhack.png"
                         alt="Superhack"
@@ -77,7 +85,15 @@ export function TeamSection() {
                       />
                       <p className="font-bold text-sm">Superhack 2023</p>
                     </div>
-                    <div className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2">
+                    <div
+                      className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2 cursor-pointer"
+                      onClick={() => {
+                        window.open(
+                          "https://ethglobal.com/showcase/priv-cast-hzitq",
+                          "_blank"
+                        );
+                      }}
+                    >
                       <Image
                         src="/circuit.png"
                         alt="Circuit Breaker"
@@ -86,7 +102,15 @@ export function TeamSection() {
                       />
                       <p className="font-bold text-sm">Circuit Breaker 2024</p>
                     </div>
-                    <div className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2">
+                    <div
+                      className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2"
+                      onClick={() => {
+                        window.open(
+                          "https://ethglobal.com/showcase/calcast-7g042",
+                          "_blank"
+                        );
+                      }}
+                    >
                       <Image
                         src="/frameworks.png"
                         alt="Frameworks"
@@ -95,7 +119,15 @@ export function TeamSection() {
                       />
                       <p className="font-bold text-sm">Frameworks 2024</p>
                     </div>
-                    <div className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2">
+                    <div
+                      className="bg-yellow-400 yellow-border p-4 text-center flex flex-col items-center space-y-2"
+                      onClick={() => {
+                        window.open(
+                          "https://ethglobal.com/showcase/walletsheets-g5p8i",
+                          "_blank"
+                        );
+                      }}
+                    >
                       <Image
                         src="/trifecta.png"
                         alt="Trifecta"

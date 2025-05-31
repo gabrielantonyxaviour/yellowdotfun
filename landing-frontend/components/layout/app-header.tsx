@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export function AppHeader() {
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 border-b-2 border-black safe-area-top">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 border-[0px]">
       <div className="px-4 py-3">
         <div className="flex items-center justify-start">
           <Link href="/home" className="flex items-center space-x-2">

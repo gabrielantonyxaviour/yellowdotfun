@@ -6,16 +6,16 @@ export function ComparisonSection() {
     <section className="bg-black text-white yellow-section">
       <div className="yellow-container">
         <div className="text-center mb-12">
-          <h2 className="yellow-heading text-yellow-400">
+          <h2 className="text-yellow-400 text-5xl font-black">
             EVM vs Solana Memecoin Trading
           </h2>
-          <p className="text-xl max-w-3xl mx-auto">
+          <p className="text-lg max-w-3xl mx-auto pt-4 text-stone-300">
             See how yellow.fun compares to Solana's PumpFun platform
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="yellow-card bg-yellow-400 text-black">
+          <Card className="yellow-card bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 text-black">
             <CardContent className="p-6">
               <h3 className="text-3xl font-black mb-6 text-center">
                 yellow.fun

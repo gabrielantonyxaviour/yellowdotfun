@@ -16,7 +16,7 @@ export function FeatureSection() {
           <Card className="yellow-card">
             <CardContent className="p-6">
               <div className="flex items-center mb-4">
-                <div className="bg-yellow-400 p-3 rounded-full yellow-border mr-4">
+                <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 p-3 rounded-full yellow-border mr-4">
                   <Zap className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold">Ultra-Fast Trading</h3>
@@ -32,7 +32,7 @@ export function FeatureSection() {
           <Card className="yellow-card">
             <CardContent className="p-6">
               <div className="flex items-center mb-4">
-                <div className="bg-yellow-400 p-3 rounded-full yellow-border mr-4">
+                <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 p-3 rounded-full yellow-border mr-4">
                   <Shield className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold">Enhanced Security</h3>
@@ -48,7 +48,7 @@ export function FeatureSection() {
           <Card className="yellow-card">
             <CardContent className="p-6">
               <div className="flex items-center mb-4">
-                <div className="bg-yellow-400 p-3 rounded-full yellow-border mr-4">
+                <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 p-3 rounded-full yellow-border mr-4">
                   <BarChart4 className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold">Aggregated Liquidity</h3>
@@ -64,7 +64,7 @@ export function FeatureSection() {
           <Card className="yellow-card">
             <CardContent className="p-6">
               <div className="flex items-center mb-4">
-                <div className="bg-yellow-400 p-3 rounded-full yellow-border mr-4">
+                <div className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 p-3 rounded-full yellow-border mr-4">
                   <Layers className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold">Multi-Chain Support</h3>
