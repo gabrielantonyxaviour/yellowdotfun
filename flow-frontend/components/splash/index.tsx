@@ -40,7 +40,13 @@ export function SplashScreen() {
         disabled={loading}
         className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
       >
-        <Image src="/flow.png" alt="Flow" width={20} height={20} />
+        <Image
+          src="/flow.png"
+          alt="Flow"
+          width={20}
+          height={20}
+          className="rounded-full"
+        />
         <p className="text-sm font-semibold">Sign in with Flow</p>
       </Button>
     </div>

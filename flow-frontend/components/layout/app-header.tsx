@@ -5,6 +5,7 @@ import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { useAccount, useDisconnect } from "wagmi";
 import { useState } from "react";
+import WalletSheet from "./wallet-sheet";
 
 export function AppHeader() {
   const { address } = useAccount();
@@ -28,14 +29,7 @@ export function AppHeader() {
           </Link>
 
           <div className="flex items-center space-x-4">
-            {/* USD Balance */}
-            <button className="flex items-center space-x-1 border border-black rounded-lg px-2 py-1 hover:bg-black/5 active:bg-black/10">
-              <Image src="/usd.png" alt="USD" width={16} height={16} />
-              <span className="text-sm font-bold text-black">
-                {balance.toLocaleString()}
-              </span>
-              <span className="text-lg text-black font-bold">+</span>
-            </button>
+            <WalletSheet />
 
             {/* Logout Button */}
             <button
