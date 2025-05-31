@@ -114,7 +114,7 @@ export function WalletSwapUI({ balance }: { balance: number }) {
     return inputAmount > fromBalance;
   };
 
-  const isSwapDisabled = !amount || hasInsufficientBalance() || priceLoading;
+  const isSwapDisabled = true;
 
   return (
     <div className="space-y-1 p-4 max-w-sm mx-auto">
@@ -223,7 +223,11 @@ export function WalletSwapUI({ balance }: { balance: number }) {
             : "bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black hover:opacity-90"
         }`}
       >
-        {hasInsufficientBalance() ? "Insufficient Funds" : "Swap"}
+        {isSwapDisabled
+          ? "Disabled"
+          : hasInsufficientBalance()
+          ? "Insufficient Funds"
+          : "Swap"}
       </button>
     </div>
   );

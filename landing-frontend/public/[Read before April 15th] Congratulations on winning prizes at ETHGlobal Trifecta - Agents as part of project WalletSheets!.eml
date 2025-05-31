@@ -1,0 +1,136 @@
+Delivered-To: gabrielantony56@gmail.com
+Received: by 2002:a05:6000:4287:b0:391:298c:d66f with SMTP id eo7csp1757120wrb;
+        Mon, 14 Apr 2025 19:19:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxm+M5RMfQxBvR4My0OR1eU7SOk7ZsiG4EHm2pxczFpgW+nuwen+IyO98Bw/8LUr1K1/yt
+X-Received: by 2002:a05:6214:48b:b0:6ed:12b0:f181 with SMTP id 6a1803df08f44-6f230d152e2mr214783056d6.14.1744683579392;
+        Mon, 14 Apr 2025 19:19:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1744683579; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Wo29ghtR9BEawSLjhVsFrMm33XSGPEJgFHCf4a4T3q/XBsFx6lza27GToNRwBryMyy
+         o5+9Oy+dTKz3mTNXi3UHWiMUFF+HmR3M99HKbm5HW5EWUo5VGYEVRUVUaFu1JaC/elVH
+         Z3TezK9gQDjfykgsoeQVOUGsBmHywBKj9+2ugI2y9bzxRnHN+bp7iZkLTJ0A1rAE4wnm
+         0b6DiWw6HVS18RuJ1u2uJSfS+jJsNMpTLhkyR96j7rGqarVlVaXGNpEyadihJlIAbQkF
+         +KPwgZzdR5aPh4kAx92VOF8q4xWkjGebJV1Tvt95Wy2IYN8+599Xmaz/mK56yp3WJgmz
+         qqGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:mime-version:from:date
+         :content-transfer-encoding:dkim-signature:dkim-signature;
+        bh=t4Ag3YLCz+eCXsF3PxhToO45GnlT0ReOejMhVl+s3a4=;
+        fh=3HhJ0fPSA0rBDQd9nBeJ0s8+Iuv04hOjs+VBBnVLn/g=;
+        b=RoMHSJxBc72pB9VI/7GwdqqDQTl/JCb7g/TzXM1S350W71oOUWmv4iSzWL2OlY+AAy
+         WCY/WiaOixzMoMH09SoroFW/XwNAnC8TiHymmec6s6jgIiU8PoRvPZtq3Fw5gpl/9ua9
+         XuV3tAYla/6XStbMmnFCrA/AG8FyoPRze/7S1oleIRM+GBXB/VB78bQqshtOlTKNtEu5
+         dS7/I4AodDNzgfZevg2Wv2aJwr6JLmYK3UyXZAadUo0KNv0sYFUvCTAdwo+9Kdw7Xg8w
+         EipKUkV+pGaIrZBefEvTgL26XbMvOByl0qkn9brHdxRwYGnRpBXeDMm7c+shtSSY4btL
+         A+Dg==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@ethglobal.com header.s=s1 header.b=15Xn1EwP;
+       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=q6i7TImf;
+       spf=pass (google.com: domain of bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com designates 149.72.178.83 as permitted sender) smtp.mailfrom="bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=ethglobal.com
+Return-Path: <bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com>
+Received: from o1.ptr1265.ethglobal.com ([149.72.178.83])
+        by mx.google.com with ESMTPS id 6a1803df08f44-6f0dea09ba5si116717506d6.376.2025.04.14.19.19.39
+        for <gabrielantony56@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Apr 2025 19:19:39 -0700 (PDT)
+Received-SPF: pass (google.com: domain of bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com designates 149.72.178.83 as permitted sender) client-ip=149.72.178.83;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@ethglobal.com header.s=s1 header.b=15Xn1EwP;
+       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=q6i7TImf;
+       spf=pass (google.com: domain of bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com designates 149.72.178.83 as permitted sender) smtp.mailfrom="bounces+15197133-8bb3-gabrielantony56=gmail.com@em3568.ethglobal.com";
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=ethglobal.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethglobal.com;
+	h=content-transfer-encoding:content-type:from:mime-version:subject:to:
+	cc:cc:content-type:feedback-id:from:subject:to;
+	s=s1; bh=t4Ag3YLCz+eCXsF3PxhToO45GnlT0ReOejMhVl+s3a4=;
+	b=15Xn1EwPRkErLPrXFuU6cU8B+WXTIq3BPWab7qEZL2fWqWiUZQm8gja1DhiO5tXqMHgh
+	f3RDEJcbkfvk0gNv2/e0FHac3Egy5DSJriCxHv8Hb6W6RhExxY0y4npWnfSgAeChNZ9qaD
+	nXUTI4WwCkijVyi2i81JpLKisBPwS33b43hGhzDdqLkX77rcreo9OvsUom1Q3//wGMfmGq
+	IlkyzWlc2RPW4zzJmTCaCdWUcbWCg+JFMoWswOO2Lth4UmWC4ykxadZwJd1AwF8g+LzbjT
+	zdE5vpGQFcMgI9ZkhdgUgnq8kIw8uqcQ7RTDdmeIv2uPL31Hxvh4hHMx2rjy5p6g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.info;
+	h=content-transfer-encoding:content-type:from:mime-version:subject:to:
+	cc:cc:content-type:feedback-id:from:subject:to;
+	s=smtpapi; bh=t4Ag3YLCz+eCXsF3PxhToO45GnlT0ReOejMhVl+s3a4=;
+	b=q6i7TImfCdbraS+Udo6OxidQKJ8LXgmpnDPJZhi0QiQBJfR/lgeboDrW958fzY7RBovb
+	UeW6kaZbYAjYZDbaTjd///rlKPMOgGRsui1dH+k/dnLhMtdcsdsXQKD3hE3taV85WfL/mk
+	VA9Qc89ou+Lx2+5zgX9ign1ov1DK0WzYo=
+Received: by recvd-798b5577cf-fbfcw with SMTP id recvd-798b5577cf-fbfcw-1-67FDC23A-42
+	2025-04-15 02:19:38.933305497 +0000 UTC m=+533475.240104285
+Received: from MTUxOTcxMzM (unknown)
+	by geopod-ismtpd-22 (SG) with HTTP
+	id KdT7QHN8TgemeD4XDt23Jg
+	Tue, 15 Apr 2025 02:19:38.927 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=utf-8
+Date: Tue, 15 Apr 2025 02:19:39 +0000 (UTC)
+From: Jacob Willemsma <jacob@ethglobal.com>
+Mime-Version: 1.0
+Message-ID: <KdT7QHN8TgemeD4XDt23Jg@geopod-ismtpd-22>
+Subject: [Read before April 15th] Congratulations on winning prizes at
+ ETHGlobal Trifecta - Agents as part of project WalletSheets!
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EuSDS9eFxEU3M+kbHxIGVRMYl95vjQnBBaeOWHWZg+A=2FoYzk1c9HG0rtDP?=
+ =?us-ascii?Q?+2Xn8=2Fd0ed6eOxfzB75dpabprYLUQVX81qT72x7?=
+ =?us-ascii?Q?zvgLF7vxN4znva2S2L+N0GOSltl+ok6jRSNiAd5?=
+ =?us-ascii?Q?xi2V8JC+ys=2FipaMChNhUrZ5ifRmRmvigxSryX66?=
+ =?us-ascii?Q?1hndg0FZRLY7=2Fdix=2FppsGCgLlF9LVHVlD7ebet6?=
+ =?us-ascii?Q?AjvW1rHXhzuKV91bTSHyUlgRtcmfF8gvYGv7W3N?= =?us-ascii?Q?w411?=
+To: gabrielantony56@gmail.com
+Cc: prizes@ethglobal.com
+X-Entity-ID: u001.vqucODxDTPexsDOyzuw0ig==
+
+<html><p>Hey Gabriel,<br/><br/>Congratulations on winning prizes at ETHGlob=
+al Trifecta - Agents! I'm excited to be reaching out to facilitate awarding=
+ these prizes to you. Your stake will be refunded by a separate process.<br=
+/><br/>To recap, your project won the following prizes at the event:<br/><u=
+l><li>Nethermind =E2=80=93 =F0=9F=8C=8E Envisioning the future of Agentic A=
+I + Physical AI - 1st place for $2500 in USDC</li><li>Nillion =E2=80=93 =F0=
+=9F=A5=B7 Best Use of Nillion SecretLLM for $1250 in USDC</li><li>AltLayer =
+=E2=80=93 =F0=9F=95=B5=EF=B8=8F=E2=80=8D=E2=99=82=EF=B8=8F Best Agent - 1st=
+ place for $1250 in USDC</li><li>ETHGlobal =E2=80=93 =F0=9F=8F=86 Trifecta =
+Agents Track - 1st place for $6250 in USDC</li></ul></p><p>Your wallet (0xb=
+5F28B38e2dCd4337483F2CA607DAe84F271DC70)=C2=A0is verified, and <b>there is =
+no need to reply to this email unless there is a mistake.</b></p><p>Prizes =
+will be sent between April 15th and April 18th, EOD ET. The prizes will be =
+sent on Ethereum Mainnet. A txid will be emailed to you when the transfer i=
+s made.</p><p>--</p><p>Take a moment to ensure that:<ol><li>Your address is=
+ an <a href=3D"https://info.etherscan.com/what-is-an-ethereum-address/">EOA=
+</a> address and not from an exchange. If your address is from an exchange =
+or is a multisig, you may lose access to your prize funds.</li><li>That you=
+ have access to the private key and that it is secure. We recommend sending=
+ a small amount of ETH to the address ahead of receiving prizes.</li><li>Yo=
+u are not an individual or representative of an entity=C2=A0sanctioned by C=
+anada under=C2=A0UNA,=C2=A0SEMA, or=C2=A0JVCFOA, or any other Canadian Spec=
+ial Economic Measures.</li></ol></p><p>--</p><p>Thanks again for attending =
+and we appreciate any feedback you can share with us. Please consider filli=
+ng out the event survey <a href=3D"https://ethglobal.com/events/trifecta-ag=
+ents/feedback">on your dashboard</a> if you have not done so already.</p><p=
+>--</p><p>We've reached out separately to your teammates below and each mem=
+ber will be receiving the following USD value in prizes distributed separat=
+ely:<ul><li>Leo Franklin John A - leofranklinjohn.25cs@licet.ac.in - $2812.=
+50</li><li>Romario Kavin - romario7kavin@gmail.com - $2812.50</li><li>Fabia=
+n Ferno - fabianferno@gmail.com - $2812.50</li><li>Gabriel Antony Xaviour -=
+ gabrielantony56@gmail.com - $2812.50</li></ul>Please note, due to the volu=
+me of prizes we're unable to accommodate custom prize percentage distributi=
+ons and the ETHGlobal team will not be responsible for team conflict mediat=
+ion.</p><p>--</p><p>Custody of your funds is your sole responsibility. ETHG=
+lobal will not refund payment sent to an incorrectly supplied or compromise=
+d address.<br/><br/>Congratulations again!<br/>- Jacob on behalf of ETHGlob=
+al</p>
+<p>&nbsp;</p>
+
+<hr />
+<p><a href=3D"https://ethglobal.com/?ref=3Demail">ETHGlobal</a>: Onboarding=
+ thousands of developers into the Ethereum ecosystem</p>
+<img src=3D"http://url8861.ethglobal.com/wf/open?upn=3Du001.LJYqMUlllO4RBO4=
+sKpBMzVqU4nQnJQAmjUpyzv-2BligV2t3swzo3A8CJjMSdpx9kCLYvPU0D-2B9X9KDhFMj8GHK0=
+aRPbnX5cgOqTpMMMEMiMJgU-2BYAiiTEOjtG94VYtYNI8K0rxIICMI8HLTBes253-2BJFezWDLu=
+720NBPfbdItlsHttdOYvuTx1c5oY5ahRLMaVBD1cohuY5naey8sVKIpoKTBppopv8Q65NiOzJUV=
+2u4-3D" alt=3D"" width=3D"1" height=3D"1" border=3D"0" style=3D"height:1px =
+!important;width:1px !important;border-width:0 !important;margin-top:0 !imp=
+ortant;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !=
+important;padding-top:0 !important;padding-bottom:0 !important;padding-righ=
+t:0 !important;padding-left:0 !important;"/></html>
