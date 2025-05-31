@@ -6,7 +6,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { WalletSwapUI } from "./wallet-swap-ui";
 
-export default function WalletSheet() {
+export default function WalletSheet({
+  connectionStatus,
+  connectToWebSocket,
+}: {
+  connectionStatus: string;
+  connectToWebSocket: () => void;
+}) {
   const [balance, setBalance] = useState(1244);
 
   return (
@@ -26,9 +32,15 @@ export default function WalletSheet() {
         className="bg-black border-t border-stone-600 rounded-t-xl"
       >
         <SheetHeader>
-          <SheetTitle className="text-white">Wallet Balance</SheetTitle>
+          <SheetTitle className="text-white text-start">
+            Wallet Balance
+          </SheetTitle>
         </SheetHeader>
-        <WalletSwapUI balance={balance} />
+        <WalletSwapUI
+          balance={balance}
+          connectionStatus={connectionStatus}
+          connectToWebSocket={connectToWebSocket}
+        />
       </SheetContent>
     </Sheet>
   );

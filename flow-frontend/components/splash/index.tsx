@@ -6,9 +6,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { worldchain } from "viem/chains";
 
-export function SplashScreen() {
+export function SplashScreen({
+  connectToWebSocket,
+}: {
+  connectToWebSocket: () => void;
+}) {
   const [loading, setLoading] = useState(false);
   const { connectAsync } = useConnect();
 
@@ -16,6 +19,7 @@ export function SplashScreen() {
     try {
       setLoading(true);
       await connectAsync({ connector: injected() });
+      connectToWebSocket();
       setLoading(false);
     } catch (error) {
       console.error("Login error:", error);

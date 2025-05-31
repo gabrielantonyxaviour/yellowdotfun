@@ -7,7 +7,13 @@ import { useAccount, useDisconnect } from "wagmi";
 import { useState } from "react";
 import WalletSheet from "./wallet-sheet";
 
-export function AppHeader() {
+export function AppHeader({
+  connectionStatus,
+  connectToWebSocket,
+}: {
+  connectionStatus: string;
+  connectToWebSocket: () => void;
+}) {
   const { address } = useAccount();
   const [balance, setBalance] = useState(1244);
   const { disconnectAsync } = useDisconnect();
@@ -29,7 +35,10 @@ export function AppHeader() {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <WalletSheet />
+            <WalletSheet
+              connectionStatus={connectionStatus}
+              connectToWebSocket={connectToWebSocket}
+            />
 
             {/* Logout Button */}
             <button

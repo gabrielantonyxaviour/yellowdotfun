@@ -1,9 +1,11 @@
 // components/WalletSwapUI.tsx
 import { useState, useEffect } from "react";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount } from "wagmi";
 import { ChevronDown } from "lucide-react";
-import { formatEther, parseEther } from "viem";
+import { formatEther } from "viem";
 import { isTesting, publicClient } from "@/lib/constants";
+import { useNitrolite } from "@/hooks/use-nitrolite";
+import { Badge } from "@/components/ui/badge";
 
 interface TokenBalance {
   symbol: string;
@@ -16,7 +18,15 @@ interface TokenPrices {
   WORLD: number;
 }
 
-export function WalletSwapUI({ balance }: { balance: number }) {
+export function WalletSwapUI({
+  balance,
+  connectionStatus,
+  connectToWebSocket,
+}: {
+  balance: number;
+  connectionStatus: string;
+  connectToWebSocket: () => void;
+}) {
   const { address } = useAccount();
   const [fromToken, setFromToken] = useState<"USD" | "FLOW" | "WORLD">("USD");
   const [toToken, setToToken] = useState<"USD" | "FLOW" | "WORLD">(
@@ -32,6 +42,17 @@ export function WalletSwapUI({ balance }: { balance: number }) {
   });
   const [priceLoading, setPriceLoading] = useState(true);
   const [nativeBalance, setNativeBalance] = useState<string>("0");
+
+  const getStatusColor = () => {
+    switch (connectionStatus) {
+      case "connected":
+        return "bg-green-500";
+      case "connecting":
+        return "bg-yellow-500";
+      default:
+        return "bg-red-500";
+    }
+  };
 
   useEffect(() => {
     if (!address) return;
@@ -118,29 +139,37 @@ export function WalletSwapUI({ balance }: { balance: number }) {
 
   return (
     <div className="space-y-1 p-4 max-w-sm mx-auto">
-      <div className="text-xs text-stone-400 mb-4 flex justify-center items-center gap-1">
-        <span>
-          {address?.slice(0, 6)}...{address?.slice(-4)}
-        </span>
-        <button
-          onClick={() => navigator.clipboard.writeText(address || "")}
-          className="hover:text-yellow-400 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      <div className="text-xs text-stone-400 mb-4 flex justify-between items-center gap-1">
+        <div className="flex items-center space-x-2">
+          <span>
+            {address?.slice(0, 6)}...{address?.slice(-4)}
+          </span>
+          <button
+            onClick={() => navigator.clipboard.writeText(address || "")}
+            className="hover:text-yellow-400 transition-colors"
           >
-            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+            </svg>
+          </button>
+        </div>
+        <Badge
+          className={`${getStatusColor()} cursor-pointer`}
+          onClick={() => connectToWebSocket()}
+        >
+          {connectionStatus}
+        </Badge>
       </div>
 
       {/* From Token */}
