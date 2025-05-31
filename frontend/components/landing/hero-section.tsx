@@ -9,11 +9,11 @@ export function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-5xl md:text-7xl font-black yellow-text mb-6">
-              Trade Memecoins on Any EVM Chain
+              The Next Gen Memecoin Trading App
             </h1>
             <p className="text-xl md:text-2xl mb-8 font-bold">
-              The first memecoin trading platform powered by Yellow Protocol's
-              state channels
+              Faster, cheaper, and EVM-secured alternative for pump.fun, built
+              using ERC7824
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/home">

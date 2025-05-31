@@ -68,8 +68,8 @@ export function SplashScreen({
           <h1 className="text-4xl font-black text-black">yellow.fun</h1>
         </div>
         <p className="text-lg font-bold text-black/80 max-w-sm leading-relaxed">
-          Faster, cheaper, and EVM-secured alternative for pumpdotfun, built
-          using ERC7824
+          Faster, cheaper, and EVM-secured alternative for pump.fun, built using
+          ERC7824
         </p>
       </div>
 

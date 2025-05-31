@@ -10,8 +10,8 @@ export function Footer() {
               yellow.fun
             </h3>
             <p className="text-gray-300">
-              The first memecoin trading platform powered by Yellow Protocol's
-              state channels.
+              Faster, cheaper, and EVM-secured alternative for pump.fun, built
+              using ERC7824
             </p>
           </div>
 

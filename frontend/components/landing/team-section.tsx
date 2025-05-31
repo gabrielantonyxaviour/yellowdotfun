@@ -64,7 +64,7 @@ export function TeamSection() {
                       width={32}
                       height={32}
                     />
-                    <p className="font-bold text-lg">5x ETHGlobal Finalist</p>
+                    <p className="font-bold text-lg">4x ETHGlobal Finalist</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
