@@ -2,59 +2,21 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MiniKit, User, WalletAuthInput } from "@worldcoin/minikit-js";
 import { useState } from "react";
 import Image from "next/image";
+import { useConnect } from "wagmi";
+import { injected } from "wagmi/connectors";
+import { worldchain } from "viem/chains";
 
-const walletAuthInput = (nonce: string): WalletAuthInput => {
-  return {
-    nonce,
-    requestId: "0",
-    expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-    notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-    statement:
-      "This is my statement and here is a link https://worldcoin.com/apps",
-  };
-};
-
-export function SplashScreen({
-  user,
-  setUser,
-}: {
-  user: User | null;
-  setUser: (user: User) => void;
-}) {
+export function SplashScreen() {
   const [loading, setLoading] = useState(false);
+  const { connectAsync } = useConnect();
+
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/nonce`);
-      const { nonce } = await res.json();
-
-      const { finalPayload } = await MiniKit.commandsAsync.walletAuth(
-        walletAuthInput(nonce)
-      );
-
-      if (finalPayload.status === "error") {
-        setLoading(false);
-        return;
-      } else {
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            payload: finalPayload,
-            nonce,
-          }),
-        });
-
-        if (response.status === 200) {
-          setUser(MiniKit.user);
-        }
-        setLoading(false);
-      }
+      await connectAsync({ connector: injected() });
+      setLoading(false);
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
@@ -75,10 +37,11 @@ export function SplashScreen({
 
       <Button
         onClick={handleLogin}
+        disabled={loading}
         className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
       >
-        <Image src="/world.png" alt="World" width={20} height={20} />
-        <p className="text-sm font-semibold">Sign in with World</p>
+        <Image src="/flow.png" alt="Flow" width={20} height={20} />
+        <p className="text-sm font-semibold">Sign in with Flow</p>
       </Button>
     </div>
   );

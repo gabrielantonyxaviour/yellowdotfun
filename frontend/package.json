@@ -9,8 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@1inch/cross-chain-sdk": "0.1.15-rc.0",
-    "@1inch/fusion-sdk": "^2.2.4",
     "@abstract-foundation/agw-client": "latest",
     "@erc7824/nitrolite": "0.2.6",
     "@hookform/resolvers": "^3.9.1",

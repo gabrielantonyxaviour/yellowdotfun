@@ -3,25 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
+import { useAccount, useDisconnect } from "wagmi";
 import { useState } from "react";
-import { User } from "@worldcoin/minikit-js";
 
-export function AppHeader({
-  user,
-  setUser,
-}: {
-  user: User | null;
-  setUser: (user: User | null) => void;
-}) {
-  const [balance, setBalance] = useState(1230);
-
+export function AppHeader() {
+  const { address } = useAccount();
+  const [balance, setBalance] = useState(1244);
+  const { disconnectAsync } = useDisconnect();
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-
-      setUser(null);
+      await disconnectAsync();
     } catch (error) {
       console.error("Logout error:", error);
     }
