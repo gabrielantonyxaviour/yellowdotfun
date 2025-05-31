@@ -7,8 +7,9 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
-  title: "yellow.fun - EVM Memecoin Trading Platform",
-  description: "Trade memecoins on any EVM chain powered by Yellow Protocol",
+  title: "yellow.fun - Next Gen Memecoin Trading App",
+  description:
+    "Faster, cheaper, and EVM-secured alternative for pump.fun, built using ERC7824",
   generator: "v0.dev",
 };
 

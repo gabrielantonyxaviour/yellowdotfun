@@ -5,16 +5,14 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import Layout from "@/components/layout";
-import { WorldProvider } from "@/components/providers/world-provider";
-import "@worldcoin/mini-apps-ui-kit-react/styles.css";
 import { ErudaProvider } from "@/components/eruda";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "yellow.fun - EVM Memecoin Trading Platform",
-  description: "Trade memecoins on any EVM chain powered by Yellow Protocol",
-  generator: "v0.dev",
+  title: "yellow.fun - Next Gen Memecoin Trading App",
+  description:
+    "Faster, cheaper, and EVM-secured alternative for pump.fun, built using ERC7824",
 };
 
 export default function RootLayout({
@@ -25,14 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ErudaProvider>
-          <WorldProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-              <Layout>{children}</Layout>
-              <Toaster />
-            </ThemeProvider>
-          </WorldProvider>
-        </ErudaProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <Layout>{children}</Layout>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,22 +1,13 @@
-import { HeroSection } from "@/components/landing/hero-section";
-import { AboutYellow } from "@/components/landing/about-yellow";
-import { ComparisonSection } from "@/components/landing/comparison-section";
-import { FeatureSection } from "@/components/landing/feature-section";
-import { TeamSection } from "@/components/landing/team-section";
-import { ContactSection } from "@/components/landing/contact-section";
-import { Footer } from "@/components/layout/footer";
+import { HomeHero } from "@/components/home/home-hero";
+import { KingOfHill } from "@/components/home/king-of-hill";
+import { TokensGrid } from "@/components/home/tokens-grid";
 
-import { AppHeader } from "@/components/layout/app-header";
-
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <main>
-      <HeroSection />
-      <AboutYellow />
-      <ComparisonSection />
-      <FeatureSection />
-      <TeamSection />
-      <ContactSection />
+    <main className="px-4 pb-20">
+      <HomeHero />
+      <KingOfHill />
+      <TokensGrid />
     </main>
   );
 }
