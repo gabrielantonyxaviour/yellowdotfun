@@ -5,10 +5,12 @@ import type React from "react";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { worldchain, worldchainSepolia } from "viem/chains";
+import { WagmiProvider } from "wagmi";
+import { config } from "@/lib/wagmi-config";
 
 export const isMainnet = process.env.NEXT_PUBLIC_USE_MAINNET === "true";
 
-export const chains = isMainnet ? [worldchain] : [worldchainSepolia];
+export const chains = [worldchain, worldchainSepolia];
 
 const queryClient = new QueryClient();
 
@@ -39,7 +41,9 @@ export function PrivyProviderWrapper({
             process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
         }}
       >
-        {children}
+        <QueryClientProvider client={queryClient}>
+          <WagmiProvider config={config}>{children}</WagmiProvider>
+        </QueryClientProvider>
       </PrivyProvider>
     </QueryClientProvider>
   );
