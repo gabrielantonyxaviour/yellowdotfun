@@ -16,11 +16,29 @@ export function HeroSection() {
               using ERC7824
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/home">
-                <Button size="lg" className="launch-btn">
-                  Launch App
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                className="launch-btn flex space-x-2 items-center"
+                onClick={() => {
+                  window.open(
+                    "https://worldcoin.org/mini-app?app_id=app_3134f79d914ce1284d8afce0921050fe&draft_id=meta_a10470c50f82786e18d6c664f5c8cfabn",
+                    "_blank"
+                  );
+                }}
+              >
+                <Image src="/world.png" alt="World" width={20} height={20} />
+                Launch Mini App
+              </Button>
+              <Button
+                size="lg"
+                className="launch-btn flex space-x-2 items-center"
+                onClick={() => {
+                  window.open("https://yellowdotfun.vercel.app", "_blank");
+                }}
+              >
+                <Image src="/flow.png" alt="flow" width={20} height={20} />
+                Launch Web App
+              </Button>
             </div>
           </div>
           <div className="relative h-[400px]">
