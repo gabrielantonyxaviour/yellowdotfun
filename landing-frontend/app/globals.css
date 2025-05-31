@@ -132,7 +132,7 @@
 }
 
 .launch-btn {
-  @apply bg-yellow-400 text-black font-black text-xl px-10 py-4 yellow-border yellow-shadow transition-all duration-200 hover:translate-y-[-4px] hover:shadow-xl;
+  @apply bg-yellow-400 text-black font-black text-lg px-6 flex items-center justify-center space-x-2 py-4 yellow-border yellow-shadow transition-all duration-200 hover:translate-y-[-4px] hover:shadow-xl;
 }
 
 /* Navbar styles */

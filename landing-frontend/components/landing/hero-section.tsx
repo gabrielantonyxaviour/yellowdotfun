@@ -19,7 +19,7 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="launch-btn flex space-x-2 items-center"
+                className="launch-btn flex space-x-6 items-center"
                 onClick={() => {
                   window.open(
                     "https://worldcoin.org/mini-app?app_id=app_3134f79d914ce1284d8afce0921050fe&draft_id=meta_a10470c50f82786e18d6c664f5c8cfabn",
@@ -27,18 +27,30 @@ export function HeroSection() {
                   );
                 }}
               >
-                <Image src="/world.png" alt="World" width={20} height={20} />
-                Launch Mini App
+                <Image
+                  src="/world.png"
+                  alt="World"
+                  width={20}
+                  height={20}
+                  className="rounded-full"
+                />
+                <p>Launch Mini App</p>
               </Button>
               <Button
                 size="lg"
-                className="launch-btn flex space-x-2 items-center"
+                className="launch-btn flex space-x-6 items-center"
                 onClick={() => {
                   window.open("https://yellowdotfun.vercel.app", "_blank");
                 }}
               >
-                <Image src="/flow.png" alt="flow" width={20} height={20} />
-                Launch Web App
+                <Image
+                  src="/flow.png"
+                  alt="flow"
+                  width={20}
+                  height={20}
+                  className="rounded-full"
+                />
+                <p>Launch Web App</p>
               </Button>
             </div>
           </div>
