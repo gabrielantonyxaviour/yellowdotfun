@@ -1,4 +1,3 @@
-// components/create/create-coin-sheet.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -86,10 +85,10 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[90vh] rounded-t-3xl border-t-2 border-black"
+        className="h-[90vh] rounded-t-3xl border-t-2 border-stone-700 bg-stone-900"
       >
         <SheetHeader className="pb-6">
-          <SheetTitle className="text-2xl font-black text-black text-start mb-4">
+          <SheetTitle className="text-2xl font-black text-white text-start mb-4">
             {step === 5 ? "Success!" : "Create Your Coin"}
           </SheetTitle>
 
@@ -100,7 +99,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <div
                   key={i}
                   className={`flex-1 h-2 rounded-full ${
-                    i + 1 <= step ? "bg-yellow-400" : "bg-gray-200"
+                    i + 1 <= step ? "bg-yellow-400" : "bg-stone-700"
                   }`}
                 />
               ))}
@@ -113,21 +112,21 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   Basic Information
                 </h3>
-                <p className="text-gray-600">Let's start with the basics</p>
+                <p className="text-stone-400">Let's start with the basics</p>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-black">
+                <Label className="text-sm font-bold text-white">
                   Coin Image *
                 </Label>
                 <div className="flex justify-center">
                   <div className="relative">
                     <label
                       htmlFor="image-upload"
-                      className="flex items-center justify-center w-32 h-32 border-4 border-dashed border-gray-300 rounded-full cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors overflow-hidden"
+                      className="flex items-center justify-center w-32 h-32 border-4 border-dashed border-stone-600 rounded-full cursor-pointer bg-stone-800 hover:bg-stone-700 transition-colors overflow-hidden"
                     >
                       {formData.image ? (
                         <img
@@ -137,8 +136,8 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center">
-                          <Upload className="w-8 h-8 mb-1 text-gray-400" />
-                          <p className="text-xs text-gray-500 font-medium text-center px-2">
+                          <Upload className="w-8 h-8 mb-1 text-stone-400" />
+                          <p className="text-xs text-stone-400 font-medium text-center px-2">
                             Upload
                           </p>
                         </div>
@@ -157,13 +156,13 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
 
               {/* Coin Name */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-bold text-black">
+                <Label htmlFor="name" className="text-sm font-bold text-white">
                   Coin Name *
                 </Label>
                 <Input
                   id="name"
                   placeholder="e.g. Yellow Doge"
-                  className="yellow-border rounded-xl py-3 text-base"
+                  className="rounded-xl py-3 text-base bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -175,14 +174,14 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
               <div className="space-y-2">
                 <Label
                   htmlFor="symbol"
-                  className="text-sm font-bold text-black"
+                  className="text-sm font-bold text-white"
                 >
                   Symbol *
                 </Label>
                 <Input
                   id="symbol"
                   placeholder="e.g. YDOGE"
-                  className="yellow-border rounded-xl py-3 text-base uppercase"
+                  className=" rounded-xl py-3 text-base uppercase bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                   value={formData.symbol}
                   onChange={(e) =>
                     setFormData({
@@ -192,7 +191,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                   }
                   maxLength={10}
                 />
-                <p className="text-xs text-gray-500">Max 10 characters</p>
+                <p className="text-xs text-stone-400">Max 10 characters</p>
               </div>
 
               <Button
@@ -210,30 +209,30 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   About Your Coin
                 </h3>
-                <p className="text-gray-600">Tell the world about your coin</p>
+                <p className="text-stone-400">Tell the world about your coin</p>
               </div>
 
               <div className="space-y-2">
                 <Label
                   htmlFor="description"
-                  className="text-sm font-bold text-black"
+                  className="text-sm font-bold text-white"
                 >
                   Description *
                 </Label>
                 <Textarea
                   id="description"
                   placeholder="Describe your coin, its purpose, and what makes it special..."
-                  className="yellow-border rounded-xl text-base resize-none h-32"
+                  className="rounded-xl text-base resize-none h-32 bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
                   maxLength={500}
                 />
-                <p className="text-xs text-gray-500 text-right">
+                <p className="text-xs text-stone-400 text-right">
                   {formData.description.length}/500 (minimum 10 characters)
                 </p>
               </div>
@@ -242,7 +241,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <Button
                   onClick={prevStep}
                   variant="outline"
-                  className="flex-1 py-4 rounded-xl border-2"
+                  className="flex-1 py-4 rounded-xl border-2 border-stone-600 bg-stone-800 text-white hover:bg-stone-700"
                 >
                   <ArrowLeft className="mr-2 h-5 w-5" />
                   Back
@@ -263,23 +262,23 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
           {step === 3 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   Social Links
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-stone-400">
                   Connect your community (optional)
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-black flex items-center gap-2">
+                  <Label className="text-sm font-bold text-white flex items-center gap-2">
                     <Twitter className="h-4 w-4" />
                     Twitter
                   </Label>
                   <Input
                     placeholder="https://twitter.com/yourtoken"
-                    className="yellow-border rounded-xl py-3 text-base"
+                    className=" rounded-xl py-3 text-base bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                     value={formData.twitter}
                     onChange={(e) =>
                       setFormData({ ...formData, twitter: e.target.value })
@@ -288,13 +287,13 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-black flex items-center gap-2">
+                  <Label className="text-sm font-bold text-white flex items-center gap-2">
                     <MessageCircle className="h-4 w-4" />
                     Telegram
                   </Label>
                   <Input
                     placeholder="https://t.me/yourtoken"
-                    className="yellow-border rounded-xl py-3 text-base"
+                    className=" rounded-xl py-3 text-base bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                     value={formData.telegram}
                     onChange={(e) =>
                       setFormData({ ...formData, telegram: e.target.value })
@@ -303,13 +302,13 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-black flex items-center gap-2">
+                  <Label className="text-sm font-bold text-white flex items-center gap-2">
                     <Globe className="h-4 w-4" />
                     Website
                   </Label>
                   <Input
                     placeholder="https://yourtoken.com"
-                    className="yellow-border rounded-xl py-3 text-base"
+                    className=" rounded-xl py-3 text-base bg-stone-800 border-stone-600 text-white placeholder:text-stone-400"
                     value={formData.website}
                     onChange={(e) =>
                       setFormData({ ...formData, website: e.target.value })
@@ -322,7 +321,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <Button
                   onClick={prevStep}
                   variant="outline"
-                  className="flex-1 py-4 rounded-xl border-2"
+                  className="flex-1 py-4 rounded-xl border-2 border-stone-600 bg-stone-800 text-white hover:bg-stone-700"
                 >
                   <ArrowLeft className="mr-2 h-5 w-5" />
                   Back
@@ -342,15 +341,15 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
           {step === 4 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-black mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   Tokenomics
                 </h3>
-                <p className="text-gray-600">Configure your token economics</p>
+                <p className="text-stone-400">Configure your token economics</p>
               </div>
 
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <Label className="text-sm font-bold text-black">
+                  <Label className="text-sm font-bold text-white">
                     Creator Allocation: {formData.creatorPercentage[0]}%
                   </Label>
                   <Slider
@@ -362,11 +361,11 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                     step={0.2}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-stone-400">
                     <span>0%</span>
                     <span>20%</span>
                   </div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-stone-400">
                     Percentage of total supply allocated to you as the creator
                   </p>
                 </div>
@@ -374,7 +373,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <div className="space-y-2">
                   <Label
                     htmlFor="liquidity"
-                    className="text-sm font-bold text-black"
+                    className="text-sm font-bold text-white"
                   >
                     Liquidity Pool Amount (USD) *
                   </Label>
@@ -382,7 +381,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                     id="liquidity"
                     type="number"
                     placeholder="1000"
-                    className="yellow-border rounded-xl py-3 text-base"
+                    className=" rounded-xl py-3 text-base bg-stone-800 text-white placeholder:text-stone-400"
                     value={formData.liquidityAmount}
                     onChange={(e) =>
                       setFormData({
@@ -392,21 +391,23 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                     }
                     min="100"
                   />
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-stone-400">
                     Minimum $5 required for initial liquidity
                   </p>
                 </div>
 
-                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
-                  <h4 className="font-bold text-black mb-2">Summary</h4>
+                <div className="bg-stone-800 border-2 border-stone-600 rounded-xl p-4">
+                  <h4 className="font-bold text-white mb-2">Summary</h4>
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Supply:</span>
-                      <span className="font-medium">1B ${formData.symbol}</span>
+                      <span className="text-stone-400">Total Supply:</span>
+                      <span className="font-medium text-white">
+                        1B ${formData.symbol}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Self Mint:</span>
-                      <span className="font-medium">
+                      <span className="text-stone-400">Self Mint:</span>
+                      <span className="font-medium text-white">
                         {(
                           (formData.creatorPercentage[0] * 1000000000) /
                           100
@@ -415,14 +416,14 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Liquidity:</span>
-                      <span className="font-medium">
+                      <span className="text-stone-400">Liquidity:</span>
+                      <span className="font-medium text-white">
                         ${formData.liquidityAmount || "0"}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm border-t border-yellow-300 pt-1.5">
-                      <span className="text-gray-600">Total Cost:</span>
-                      <span className="font-bold text-black">
+                    <div className="flex justify-between text-sm border-t border-stone-600 pt-1.5">
+                      <span className="text-stone-400">Total Cost:</span>
+                      <span className="font-bold text-white">
                         ${Number(formData.liquidityAmount) + 1}
                       </span>
                     </div>
@@ -434,7 +435,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <Button
                   onClick={prevStep}
                   variant="outline"
-                  className="flex-1 py-4 rounded-xl border-2"
+                  className="flex-1 py-4 rounded-xl border-2 border-stone-600 bg-stone-800 text-white hover:bg-stone-700"
                 >
                   <ArrowLeft className="mr-2 h-5 w-5" />
                   Back
@@ -453,27 +454,27 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
           {/* Step 5: Success */}
           {step === 5 && (
             <div className="text-center py-8 space-y-6">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle className="h-10 w-10 text-green-600" />
+              <div className="w-20 h-20 bg-green-900 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="h-10 w-10 text-green-400" />
               </div>
 
               <div>
-                <h3 className="text-2xl font-bold text-black mb-2">
+                <h3 className="text-2xl font-bold text-white mb-2">
                   Coin Created!
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-stone-400">
                   Your coin is now live on the blockchain
                 </p>
               </div>
 
-              <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 text-left">
-                <p className="font-bold text-black mb-2">
+              <div className="bg-stone-800 border-2 border-stone-600 rounded-xl p-4 text-left">
+                <p className="font-bold text-white mb-2">
                   {formData.name} (${formData.symbol})
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-stone-400 mb-2">
                   Contract: 0x1234...5678
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-stone-400">
                   Your allocation: {formData.creatorPercentage[0]}%
                 </p>
               </div>
@@ -484,7 +485,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full py-4 rounded-xl border-2"
+                  className="w-full py-4 rounded-xl border-2 border-stone-600 bg-stone-800 text-white hover:bg-stone-700"
                   onClick={() => onOpenChange(false)}
                 >
                   Close
