@@ -150,3 +150,34 @@ header .yellow-text {
 
 /* Landing page specific styles */
 /* Dark mode overrides are handled by Tailwind's dark mode configuration */
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-to-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.animate-in {
+  animation-duration: 300ms;
+  animation-fill-mode: both;
+}
+
+.slide-in-from-bottom {
+  animation-name: slide-in-from-bottom;
+}
+
+.slide-out-to-bottom {
+  animation-name: slide-out-to-bottom;
+}

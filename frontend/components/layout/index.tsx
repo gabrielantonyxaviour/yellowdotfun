@@ -80,7 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     </div>
   ) : user ? (
     <div className="min-h-screen bg-black">
-      <AppHeader />
+      <AppHeader user={user} setUser={setUser} />
       {children}
       {!MiniKit.isInstalled() && <Footer />}
     </div>

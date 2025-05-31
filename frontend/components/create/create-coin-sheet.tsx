@@ -26,11 +26,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-interface CreateCoinSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
 interface FormData {
   name: string;
   symbol: string;
@@ -43,8 +38,9 @@ interface FormData {
   liquidityAmount: string;
 }
 
-export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
+export function CreateCoinSheet() {
   const [step, setStep] = useState(1);
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     symbol: "",
@@ -84,18 +80,15 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
     formData.liquidityAmount && parseFloat(formData.liquidityAmount) > 0;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger>
-        <Button
-          className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 rounded-xl p-3"
-          onClick={() => onOpenChange(true)}
-        >
+        <Button className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 rounded-xl p-3">
           <Plus className="h-5 w-5" />
         </Button>
       </SheetTrigger>
       <SheetContent
         side="bottom"
-        className="h-[90vh] rounded-t-3xl border-t-2 border-stone-700 bg-stone-900"
+        className="h-[90vh] rounded-t-3xl border-t-2 border-stone-700 bg-stone-900 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300 data-[state=closed]:duration-200"
       >
         <SheetHeader className="pb-6">
           <SheetTitle className="text-2xl font-black text-white text-start mb-4">
@@ -177,6 +170,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
+                  autoFocus={false}
                 />
               </div>
 
@@ -200,6 +194,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                     })
                   }
                   maxLength={10}
+                  autoFocus={false}
                 />
                 <p className="text-xs text-stone-400">Max 10 characters</p>
               </div>
@@ -496,7 +491,7 @@ export function CreateCoinSheet({ open, onOpenChange }: CreateCoinSheetProps) {
                 <Button
                   variant="outline"
                   className="w-full py-4 rounded-xl border-2 border-stone-600 bg-stone-800 text-white hover:bg-stone-700"
-                  onClick={() => onOpenChange(false)}
+                  onClick={() => setOpen(false)}
                 >
                   Close
                 </Button>

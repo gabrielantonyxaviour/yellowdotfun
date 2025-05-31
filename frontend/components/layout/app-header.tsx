@@ -4,9 +4,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
+import { User } from "@worldcoin/minikit-js";
 
-export function AppHeader() {
+export function AppHeader({
+  user,
+  setUser,
+}: {
+  user: User | null;
+  setUser: (user: User | null) => void;
+}) {
   const [balance, setBalance] = useState(1230);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 border-b-2 border-black safe-area-top">
@@ -28,7 +47,10 @@ export function AppHeader() {
             </button>
 
             {/* Logout Button */}
-            <button className="p-1 hover:bg-black/10 rounded">
+            <button
+              className="p-1 hover:bg-black/10 rounded"
+              onClick={handleLogout}
+            >
               <LogOut className="w-6 h-6 text-black" />
             </button>
           </div>

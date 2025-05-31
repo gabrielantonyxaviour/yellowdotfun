@@ -8,18 +8,13 @@ import { useState } from "react";
 import { CreateCoinSheet } from "@/components/create/create-coin-sheet";
 
 export function HomeHero() {
-  const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
-
   return (
     <>
       <div className="py-6 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-black text-white">Coins</h1>
 
-          <CreateCoinSheet
-            open={isCreateSheetOpen}
-            onOpenChange={setIsCreateSheetOpen}
-          />
+          <CreateCoinSheet />
         </div>
 
         <div className="relative">
