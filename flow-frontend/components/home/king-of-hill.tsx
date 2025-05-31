@@ -1,21 +1,50 @@
 // components/home/KingOfHill.tsx
 "use client";
 import { Button } from "@/components/ui/button";
-import { Crown, TrendingUp, ArrowRight } from "lucide-react";
+import {
+  Crown,
+  TrendingUp,
+  TrendingDown,
+  ArrowRight,
+  ShoppingCart,
+  Store,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatNumber, formatPercentage } from "@/lib/utils";
+import { useTokenStats } from "@/hooks/use-token-stats";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function KingOfHill() {
-  const kingToken = {
-    id: "1",
-    name: "Yellow Doge",
-    symbol: "YDOGE",
-    price: 0.0234,
-    priceChange24h: 145.67,
-    marketCap: 2340000,
-    volume24h: 567000,
-  };
+  const { kingToken, isLoading } = useTokenStats();
+
+  if (isLoading) {
+    return (
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <Crown className="h-5 w-5 text-yellow-600" />
+          <h2 className="text-lg font-semibold text-white">King of the Hill</h2>
+        </div>
+        <Skeleton className="h-48 w-full rounded-2xl bg-stone-800" />
+      </div>
+    );
+  }
+
+  if (!kingToken) {
+    return (
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <Crown className="h-5 w-5 text-yellow-600" />
+          <h2 className="text-lg font-semibold text-white">King of the Hill</h2>
+        </div>
+        <div className="bg-stone-800 rounded-2xl p-4 border-2 border-stone-600">
+          <p className="text-center text-stone-400">No tokens available yet</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isPositive = kingToken.price_change_24h >= 0;
 
   return (
     <div className="mb-6">
@@ -28,8 +57,10 @@ export function KingOfHill() {
         <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-black">
             <Image
-              src="/placeholder.svg?height=48&width=48"
-              alt={kingToken.name}
+              src={
+                kingToken.token_image || "/placeholder.svg?height=48&width=48"
+              }
+              alt={kingToken.token_name}
               width={48}
               height={48}
               className="w-full h-full object-cover"
@@ -37,34 +68,50 @@ export function KingOfHill() {
           </div>
 
           <div className="flex-1">
-            <h3 className="text-lg font-black text-black">{kingToken.name}</h3>
+            <h3 className="text-lg font-black text-black">
+              {kingToken.token_name}
+            </h3>
             <p className="text-sm font-bold text-black/80">
-              ${kingToken.symbol}
+              ${kingToken.token_symbol}
             </p>
           </div>
 
           <div className="text-right">
             <p className="text-lg font-black text-black">
-              ${formatNumber(kingToken.price)}
+              ${formatNumber(kingToken.latest_price)}
             </p>
-            <p className="text-sm font-bold text-green-700 flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />+
-              {formatPercentage(kingToken.priceChange24h)}
+            <p
+              className={`text-sm font-bold flex items-center gap-1 ${
+                isPositive ? "text-green-700" : "text-red-700"
+              }`}
+            >
+              {isPositive ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : (
+                <TrendingDown className="h-4 w-4" />
+              )}
+              {formatPercentage(kingToken.price_change_24h)}
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-black/20 rounded-lg p-2">
-            <p className="text-xs font-medium text-black/80">Market Cap</p>
+            <div className="flex items-center gap-1 mb-1">
+              <ShoppingCart className="h-3 w-3 text-black/80" />
+              <p className="text-xs font-medium text-black/80">Buy Count</p>
+            </div>
             <p className="text-sm font-bold text-black">
-              ${formatNumber(kingToken.marketCap)}
+              {parseInt(kingToken.buy_count.toString()).toLocaleString()}
             </p>
           </div>
           <div className="bg-black/20 rounded-lg p-2">
-            <p className="text-xs font-medium text-black/80">Volume 24h</p>
+            <div className="flex items-center gap-1 mb-1">
+              <Store className="h-3 w-3 text-black/80" />
+              <p className="text-xs font-medium text-black/80">Sell Count</p>
+            </div>
             <p className="text-sm font-bold text-black">
-              ${formatNumber(kingToken.volume24h)}
+              {parseInt(kingToken.sell_count.toString()).toLocaleString()}
             </p>
           </div>
         </div>

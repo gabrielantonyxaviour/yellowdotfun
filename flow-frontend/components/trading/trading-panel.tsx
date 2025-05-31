@@ -75,37 +75,57 @@ export function TradingPanel({ token }: TradingPanelProps) {
   };
 
   return (
-    <Card className="yellow-border yellow-shadow bg-white p-6 sticky top-24">
-      <h2 className="text-2xl font-black cartoon-text mb-4">
+    <Card className="bg-stone-800 rounded-lg shadow-lg border-none p-6 sticky top-24">
+      <h2 className="text-2xl font-black text-white cartoon-text mb-4">
         Trade ${token.symbol}
       </h2>
-
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-        <p className="text-sm font-medium">Your Balance</p>
-        <p className="font-bold">{formatNumber(userEthBalance)} ETH</p>
-        <p className="font-bold">
-          {formatNumber(userTokenBalance)} {token.symbol}
-        </p>
+      <div className="mb-4 p-4 bg-stone-900 rounded-lg space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-gray-400">Your Balance</p>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <p className="text-xs text-gray-400">Live</p>
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-400">{token.symbol}</p>
+            <p className="font-bold text-white">
+              {formatNumber(userTokenBalance)}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-        <p className="text-sm font-medium">Current Price</p>
-        <p className="text-xl font-bold">${formatNumber(currentPrice)}</p>
+      <div className="mb-4 p-4 bg-stone-900 rounded-lg space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-gray-400">Current Price</p>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+            <p className="text-xs text-gray-400">Live</p>
+          </div>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <p className="text-2xl font-black text-white">
+            {formatNumber(currentPrice)}
+          </p>
+          <p className="text-sm text-gray-400">USD</p>
+        </div>
       </div>
 
       <Tabs defaultValue="buy" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 cartoon-border">
-          <TabsTrigger value="buy" className="font-bold">
+        <TabsList className="grid w-full grid-cols-2 bg-stone-900 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:via-yellow-600 data-[state=active]:to-yellow-400">
+          <TabsTrigger value="buy" className="font-semibold">
             Buy
           </TabsTrigger>
-          <TabsTrigger value="sell" className="font-bold">
+          <TabsTrigger value="sell" className="font-semibold">
             Sell
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="buy" className="space-y-4">
           <div>
-            <Label htmlFor="buy-amount" className="font-bold">
+            <Label htmlFor="buy-amount" className="font-bold text-white">
               Amount (ETH)
             </Label>
             <Input
@@ -114,16 +134,18 @@ export function TradingPanel({ token }: TradingPanelProps) {
               placeholder="0.00"
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
-              className="cartoon-border font-bold text-lg"
+              className=" font-medium text-lg bg-stone-900 border-none text-white"
               max={userEthBalance}
               step="0.001"
             />
           </div>
 
           <div>
-            <Label className="font-bold">You'll receive (approx)</Label>
-            <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
-              <p className="text-lg font-bold">
+            <Label className="font-bold text-white">
+              You'll receive (approx)
+            </Label>
+            <div className="cartoon-border bg-stone-900 p-3 rounded-lg">
+              <p className="text-lg font-medium text-yellow-400 ">
                 {buyAmount && currentPrice > 0
                   ? formatNumber(parseFloat(buyAmount) / currentPrice)
                   : "0"}{" "}
@@ -143,7 +165,10 @@ export function TradingPanel({ token }: TradingPanelProps) {
 
         <TabsContent value="sell" className="space-y-4">
           <div>
-            <Label htmlFor="sell-amount" className="font-bold">
+            <Label
+              htmlFor="sell-amount"
+              className="font-semibold text-white pb-1"
+            >
               Amount ({token.symbol})
             </Label>
             <Input
@@ -152,15 +177,17 @@ export function TradingPanel({ token }: TradingPanelProps) {
               placeholder="0.00"
               value={sellAmount}
               onChange={(e) => setSellAmount(e.target.value)}
-              className="cartoon-border font-bold text-lg"
+              className="font-bold text-lg bg-stone-900 border-none text-white"
               max={userTokenBalance}
               step="0.000001"
             />
           </div>
 
           <div>
-            <Label className="font-bold">You'll receive (approx)</Label>
-            <div className="cartoon-border bg-gray-50 p-3 rounded-lg">
+            <Label className="font-semibold text-white pb-1">
+              You'll receive (approx)
+            </Label>
+            <div className="text-white bg-stone-900 p-3 rounded-lg">
               <p className="text-lg font-bold">
                 {sellAmount && currentPrice > 0
                   ? formatNumber(parseFloat(sellAmount) * currentPrice)
@@ -180,10 +207,10 @@ export function TradingPanel({ token }: TradingPanelProps) {
         </TabsContent>
       </Tabs>
 
-      <div className="mt-6 pt-6 border-t-2 border-black">
+      <div className="mt-6 pt-6 border-t-[1px] border-stone-600">
         <div className="flex justify-between items-center mb-2">
-          <Label className="font-bold">Slippage Tolerance</Label>
-          <span className="font-bold">{slippage[0]}%</span>
+          <Label className="font-bold text-white">Slippage Tolerance</Label>
+          <span className="font-bold text-white">{slippage[0]}%</span>
         </div>
         <Slider
           value={slippage}

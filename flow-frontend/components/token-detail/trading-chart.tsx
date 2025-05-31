@@ -1,192 +1,149 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createChart,
   ColorType,
   type UTCTimestamp,
   type IChartApi,
-  type ISeriesApi,
   type CandlestickData,
   type HistogramData,
-  SeriesType,
   CandlestickSeries,
   HistogramSeries,
 } from "lightweight-charts";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { type Transaction } from "@/lib/supabase";
 
 interface TradingChartProps {
   tokenId: string;
+  transactions: Transaction[];
 }
 
-// Generate realistic price data
-function generatePriceData(
-  days: number,
-  startPrice: number,
-  volatility: number
-) {
-  const data = [];
-  let currentPrice = startPrice;
-  const now = new Date();
+// Convert transactions to OHLCV data
+function processTransactionsToOHLCV(
+  transactions: Transaction[],
+  timeframe: string
+): { candlestickData: CandlestickData[]; volumeData: HistogramData[] } {
+  if (!transactions.length) return { candlestickData: [], volumeData: [] };
 
-  // Generate a pump and dump pattern
-  const pumpPhase = days * 0.3; // 30% of time for pump
-  const dumpPhase = days * 0.2; // 20% of time for dump
-  const recoveryPhase = days * 0.5; // 50% of time for recovery
+  const sorted = [...transactions].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
-  for (let i = days; i >= 0; i--) {
-    const time = new Date(now);
-    time.setDate(now.getDate() - i);
+  const intervals: { [key: string]: Transaction[] } = {};
+  const intervalMs = getIntervalMs(timeframe);
 
-    let trend = 0;
-    let volatilityMultiplier = 1;
+  sorted.forEach((tx) => {
+    const timestamp = new Date(tx.timestamp).getTime();
+    const intervalStart = Math.floor(timestamp / intervalMs) * intervalMs;
+    const key = intervalStart.toString();
 
-    // Pump phase
-    if (i > days - pumpPhase) {
-      trend = 0.02; // Strong uptrend
-      volatilityMultiplier = 1.5; // Higher volatility during pump
-    }
-    // Dump phase
-    else if (i > days - pumpPhase - dumpPhase) {
-      trend = -0.015; // Strong downtrend
-      volatilityMultiplier = 2; // Highest volatility during dump
-    }
-    // Recovery phase
-    else {
-      trend = 0.005; // Slight uptrend
-      volatilityMultiplier = 1.2; // Moderate volatility
-    }
+    if (!intervals[key]) intervals[key] = [];
+    intervals[key].push(tx);
+  });
 
-    // Add some random noise
-    const noise = (Math.random() - 0.5) * volatility * volatilityMultiplier;
-    currentPrice = Math.max(0.0001, currentPrice * (1 + trend + noise));
+  const candlestickData: CandlestickData[] = [];
+  const volumeData: HistogramData[] = [];
 
-    // Generate intraday volatility
-    const open = currentPrice * (1 + (Math.random() - 0.5) * 0.02);
-    const high = Math.max(open, currentPrice) * (1 + Math.random() * 0.03);
-    const low = Math.min(open, currentPrice) * (1 - Math.random() * 0.03);
-    const close = currentPrice;
+  Object.entries(intervals).forEach(([timestamp, txs]) => {
+    const prices = txs.map((tx) => tx.usd_amount / tx.token_amount);
+    const volume = txs.reduce((sum, tx) => sum + tx.usd_amount, 0);
+    const time = (parseInt(timestamp) / 1000) as UTCTimestamp;
 
-    // Generate volume with correlation to price movement
-    const priceChange = Math.abs(close - open) / open;
-    const baseVolume = 100000;
-    const volumeMultiplier = 1 + priceChange * 10; // Higher volume on bigger moves
-    const volume = Math.floor(
-      baseVolume * volumeMultiplier * (1 + Math.random() * 0.5)
-    );
+    const open = prices[0];
+    const high = Math.max(...prices);
+    const low = Math.min(...prices);
+    const close = prices[prices.length - 1];
 
-    data.push({
-      time: (time.getTime() / 1000) as UTCTimestamp,
+    candlestickData.push({
+      time,
       open,
       high,
       low,
       close,
-      volume,
     });
-  }
 
-  return data;
+    volumeData.push({
+      time,
+      value: volume,
+      color: close >= open ? "#facc15aa" : "#ef4444aa", // Yellow/red with transparency
+    });
+  });
+
+  return {
+    candlestickData: candlestickData.sort(
+      (a, b) => (a.time as number) - (b.time as number)
+    ),
+    volumeData: volumeData.sort(
+      (a, b) => (a.time as number) - (b.time as number)
+    ),
+  };
 }
 
-export function TradingChart({ tokenId }: TradingChartProps) {
+function getIntervalMs(timeframe: string): number {
+  switch (timeframe) {
+    case "1M":
+      return 60 * 1000;
+    case "5M":
+      return 5 * 60 * 1000;
+    case "15M":
+      return 15 * 60 * 1000;
+    case "1H":
+      return 60 * 60 * 1000;
+    case "4H":
+      return 4 * 60 * 60 * 1000;
+    case "1D":
+      return 24 * 60 * 60 * 1000;
+    default:
+      return 60 * 1000;
+  }
+}
+
+export function TradingChart({ tokenId, transactions }: TradingChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timeframe, setTimeframe] = useState("1D");
+  const chartRef = useRef<IChartApi | null>(null);
+  const candlestickSeriesRef = useRef<any>(null);
+  const volumeSeriesRef = useRef<any>(null);
+  const [timeframe, setTimeframe] = useState("5M");
 
+  // Initialize chart
   useEffect(() => {
-    if (!chartContainerRef.current) {
-      console.log("Chart container ref is null");
-      return;
-    }
-
-    console.log("Chart container dimensions:", {
-      width: chartContainerRef.current.clientWidth,
-      height: chartContainerRef.current.clientHeight,
-    });
-
-    setIsLoading(true);
-
-    // Generate data based on timeframe
-    let days = 1;
-    switch (timeframe) {
-      case "1D":
-        days = 1;
-        break;
-      case "1W":
-        days = 7;
-        break;
-      case "1M":
-        days = 30;
-        break;
-      case "3M":
-        days = 90;
-        break;
-      case "1Y":
-        days = 365;
-        break;
-      default:
-        days = 1;
-    }
-
-    const data = generatePriceData(days, 0.0234, 0.05);
-    console.log("Generated data:", data.slice(0, 3)); // Log first 3 items
-    console.log("Data length:", data.length);
+    if (!chartContainerRef.current) return;
 
     const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { type: ColorType.Solid, color: "white" },
-        textColor: "black",
-        fontFamily: "'Inter', sans-serif",
+        background: { type: ColorType.Solid, color: "transparent" }, // Transparent to use parent bg
+        textColor: "#ffffff",
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontSize: 12,
       },
       grid: {
-        vertLines: { color: "#e0e0e0", style: 1 },
-        horzLines: { color: "#e0e0e0", style: 1 },
+        vertLines: { color: "#374151", style: 1 }, // gray-700
+        horzLines: { color: "#374151", style: 1 },
       },
       width: chartContainerRef.current.clientWidth,
-      height: 400,
+      height: 500,
+      rightPriceScale: {
+        borderColor: "#6b7280", // gray-500
+        scaleMargins: { top: 0.1, bottom: 0.3 },
+      },
       timeScale: {
+        borderColor: "#6b7280",
         timeVisible: true,
         secondsVisible: false,
-        borderColor: "#000000",
-        tickMarkFormatter: (time: number) => {
-          const date = new Date(time * 1000);
-          return date.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-        },
-      },
-      rightPriceScale: {
-        borderColor: "#000000",
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0.5, // Leave space for volume
-        },
       },
       crosshair: {
         mode: 1,
-        vertLine: {
-          color: "#000000",
-          style: 1,
-          width: 1,
-        },
-        horzLine: {
-          color: "#000000",
-          style: 1,
-          width: 1,
-        },
+        vertLine: { color: "#facc15", style: 3, width: 1 }, // yellow-400
+        horzLine: { color: "#facc15", style: 3, width: 1 },
       },
     });
 
-    console.log("Chart created:", chart);
-
+    // Candlestick series
     const candlestickSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#22c55e",
-      downColor: "#ef4444",
-      borderVisible: true,
-      borderUpColor: "#22c55e",
-      borderDownColor: "#ef4444",
+      upColor: "#22c55e", // green-500
+      downColor: "#ef4444", // red-500
+      borderVisible: false,
       wickUpColor: "#22c55e",
       wickDownColor: "#ef4444",
       priceFormat: {
@@ -196,38 +153,20 @@ export function TradingChart({ tokenId }: TradingChartProps) {
       },
     });
 
-    console.log("Candlestick series created:", candlestickSeries);
-
-    try {
-      candlestickSeries.setData(data);
-      console.log("Candlestick data set successfully");
-    } catch (error) {
-      console.error("Error setting candlestick data:", error);
-    }
-
+    // Volume series
     const volumeSeries = chart.addSeries(HistogramSeries, {
-      color: "#22c55e",
-      priceFormat: {
-        type: "volume",
-      },
-      priceScaleId: "volume", // Use named scale instead of empty string
+      color: "#facc15", // yellow-400
+      priceFormat: { type: "volume" },
+      priceScaleId: "volume",
     });
 
-    volumeSeries.setData(
-      data.map((item) => ({
-        time: item.time,
-        value: item.volume,
-        color: item.close > item.open ? "#22c55e" : "#ef4444",
-      }))
-    );
-
-    // Set scale margins on the volume price scale
     chart.priceScale("volume").applyOptions({
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0,
-      },
+      scaleMargins: { top: 0.8, bottom: 0 },
     });
+
+    chartRef.current = chart;
+    candlestickSeriesRef.current = candlestickSeries;
+    volumeSeriesRef.current = volumeSeries;
 
     const handleResize = () => {
       if (chartContainerRef.current) {
@@ -236,28 +175,52 @@ export function TradingChart({ tokenId }: TradingChartProps) {
     };
 
     window.addEventListener("resize", handleResize);
-    setIsLoading(false);
-
-    setTimeout(() => {
-      chart.timeScale().fitContent();
-    }, 100);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       chart.remove();
     };
-  }, [timeframe, tokenId]);
+  }, []);
+
+  // Update chart data when transactions change
+  useEffect(() => {
+    if (
+      !chartRef.current ||
+      !candlestickSeriesRef.current ||
+      !volumeSeriesRef.current
+    ) {
+      return;
+    }
+
+    const { candlestickData, volumeData } = processTransactionsToOHLCV(
+      transactions,
+      timeframe
+    );
+
+    if (candlestickData.length > 0) {
+      candlestickSeriesRef.current.setData(candlestickData);
+      volumeSeriesRef.current.setData(volumeData);
+
+      // Auto-fit content
+      setTimeout(() => {
+        chartRef.current?.timeScale().fitContent();
+      }, 100);
+    }
+  }, [transactions, timeframe]);
 
   return (
-    <div className="p-4">
-      <div className="flex gap-2 mb-4">
-        {["1D", "1W", "1M", "3M", "1Y"].map((tf) => (
+    <div className="bg-stone-800 rounded-lg">
+      {/* Timeframe buttons */}
+      <div className="flex gap-2 p-4 border-b border-gray-700">
+        {["1M", "5M", "15M", "1H", "4H", "1D"].map((tf) => (
           <Button
             key={tf}
             variant="outline"
             size="sm"
-            className={`yellow-border ${
-              timeframe === tf ? "bg-yellow-400 text-black" : ""
+            className={`font-bold border transition-all ${
+              timeframe === tf
+                ? "bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black border-yellow-500"
+                : "bg-stone-700 text-white border-gray-600 hover:bg-stone-600 hover:border-gray-500"
             }`}
             onClick={() => setTimeframe(tf)}
           >
@@ -266,8 +229,13 @@ export function TradingChart({ tokenId }: TradingChartProps) {
         ))}
       </div>
 
-      <div ref={chartContainerRef} className="w-full h-[400px]" />
-      {isLoading && <Skeleton className="absolute inset-0 h-[400px] w-full" />}
+      {/* Chart container */}
+      <div className="p-4">
+        <div
+          ref={chartContainerRef}
+          className="w-full h-[500px] rounded-lg bg-stone-900"
+        />
+      </div>
     </div>
   );
 }
