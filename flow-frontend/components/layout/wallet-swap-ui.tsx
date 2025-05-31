@@ -103,12 +103,33 @@ export function WalletSwapUI({ balance }: { balance: number }) {
 
   return (
     <div className="space-y-1 p-4 max-w-sm mx-auto">
-      <div className="text-xs text-stone-400 mb-4">
-        Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+      <div className="text-xs text-stone-400 mb-4 flex justify-center items-center gap-1">
+        <span>
+          {address?.slice(0, 6)}...{address?.slice(-4)}
+        </span>
+        <button
+          onClick={() => navigator.clipboard.writeText(address || "")}
+          className="hover:text-yellow-400 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+          </svg>
+        </button>
       </div>
 
       {/* From Token */}
-      <div className="bg-stone-800 rounded-lg p-3 border border-stone-600 relative z-10">
+      <div className="bg-stone-800 rounded-lg p-3 border border-stone-600 relative my-2 -translate-y-[1.5px] z-10">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-stone-400">From</span>
           <span className="text-xs text-stone-400">
@@ -134,16 +155,13 @@ export function WalletSwapUI({ balance }: { balance: number }) {
             </span>
           </div>
         </div>
-        {hasInsufficientBalance() && (
-          <div className="text-xs text-red-400 mt-1">Insufficient balance</div>
-        )}
       </div>
 
       {/* Swap Button - Overlapping */}
-      <div className="flex justify-center relative -my-3 z-20">
+      <div className="flex justify-center absolute top-[45%] left-[45%] z-20">
         <button
           onClick={swapTokens}
-          className="p-2 border border-stone-600 rounded-full hover:bg-stone-800 bg-stone-900"
+          className="p-2 border border-stone-600 rounded-lg hover:bg-stone-800 bg-stone-900"
         >
           <ChevronDown
             className={`w-4 h-4 text-yellow-400 transition-transform duration-200 ${
@@ -154,7 +172,7 @@ export function WalletSwapUI({ balance }: { balance: number }) {
       </div>
 
       {/* To Token */}
-      <div className="bg-stone-800 rounded-lg p-3 border border-stone-600 relative z-10">
+      <div className="bg-stone-800 rounded-lg p-3 border border-stone-600 relative translate-y-[1.5px] z-10">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-stone-400">To</span>
           <span className="text-xs text-stone-400">
@@ -184,7 +202,7 @@ export function WalletSwapUI({ balance }: { balance: number }) {
 
       <button
         disabled={isSwapDisabled}
-        className={`w-full py-3 rounded-lg font-semibold text-sm mt-4 ${
+        className={`w-full py-3 rounded-lg font-semibold text-sm translate-y-[8px] ${
           isSwapDisabled
             ? "bg-stone-700 text-stone-400 cursor-not-allowed"
             : "bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-black hover:opacity-90"
