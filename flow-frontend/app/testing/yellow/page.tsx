@@ -2,13 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WebSocketConnection from "@/components/testing/yellow/web-socket-connection";
 import AuthenticationPanel from "@/components/testing/yellow/authentication-panel";

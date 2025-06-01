@@ -46,7 +46,9 @@ export const useNitrolite = () => {
   const [allocations, setAllocations] = useState<Allocation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const { address } = useAccount();
+  const [usdBalance, setUsdBalance] = useState<number>(0);
+  const [hasChannel, setHasChannel] = useState<boolean | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
 
   const walletRef = useRef<ethers.Wallet | null>(null);
 
@@ -63,6 +65,11 @@ export const useNitrolite = () => {
 
   const browserSigner = useCallback(async (payload: any) => {
     const challenge = validateChallenge(payload);
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
 
     const walletClient = createWalletClient({
       chain: isTesting ? worldchain : flowMainnet,
@@ -150,8 +157,13 @@ export const useNitrolite = () => {
         ) {
           console.log("Authentication successful");
           setIsAuthenticated(true);
-          await addParticipantToDatabase(address as Address);
-          await loadParticipants();
+          if (message.res[2][0].length > 0) {
+            setHasChannel(true);
+            await addParticipantToDatabase(address as Address);
+            await loadParticipants();
+          } else {
+            setHasChannel(false);
+          }
         } else if (message.res && message.res[1] === "auth_failure") {
           console.error("Authentication failed:", message.res[2]);
           setError(`Authentication failed: ${message.res[2]}`);
@@ -205,6 +217,7 @@ export const useNitrolite = () => {
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
+      setAddress(address);
       console.log("Connected wallet address:", address);
 
       console.log("Creating signing wallet");
@@ -368,6 +381,10 @@ export const useNitrolite = () => {
     currentSession,
     allocations,
     error,
+    hasChannel,
+    usdBalance,
+    setUsdBalance,
+    setHasChannel,
     connectToWebSocket,
     authenticateUser,
     createAppSession,
