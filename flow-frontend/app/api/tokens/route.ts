@@ -7,7 +7,7 @@ interface CreateTokenRequest {
   token_symbol: string;
   token_image?: string;
   creator_allocation?: number;
-  initial_liquidity_amount: number;
+  liquidity_amount: number;
   twitter?: string;
   telegram?: string;
   website?: string;
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         token_symbol: body.token_symbol,
         token_image: body.token_image,
         creator_allocation: body.creator_allocation || 0,
-        initial_liquidity_amount: body.initial_liquidity_amount,
+        liquidity_amount: body.liquidity_amount,
         twitter: body.twitter,
         telegram: body.telegram,
         website: body.website,

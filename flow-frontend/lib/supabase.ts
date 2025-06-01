@@ -12,7 +12,7 @@ export interface Token {
   token_symbol: string;
   token_image?: string;
   creator_allocation: number;
-  initial_liquidity_amount: number;
+  liquidity_amount: number;
   twitter?: string;
   telegram?: string;
   website?: string;

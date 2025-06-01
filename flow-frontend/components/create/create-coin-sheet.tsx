@@ -28,7 +28,7 @@ import { useState } from "react";
 import { useNitrolite } from "@/hooks/use-nitrolite";
 import { ethers } from "ethers";
 import { Address } from "viem";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   name: string;
@@ -139,7 +139,7 @@ export function CreateCoinSheet() {
       token_symbol: string;
       token_image?: string;
       creator_allocation?: number;
-      initial_liquidity_amount: number;
+      liquidity_amount: number;
       twitter?: string;
       telegram?: string;
       website?: string;
@@ -151,7 +151,7 @@ export function CreateCoinSheet() {
       token_symbol: formData.symbol,
       token_image: imageUrl,
       creator_allocation: formData.creatorPercentage[0],
-      initial_liquidity_amount: parseFloat(formData.liquidityAmount),
+      liquidity_amount: parseFloat(formData.liquidityAmount),
       twitter: formData.twitter,
       telegram: formData.telegram,
       website: formData.website,
@@ -174,7 +174,7 @@ export function CreateCoinSheet() {
         name: tokenData.token_name,
         symbol: tokenData.token_symbol,
         creatorAllocation: tokenData.creator_allocation,
-        liquidityAmount: tokenData.initial_liquidity_amount,
+        liquidityAmount: tokenData.liquidity_amount,
       });
       setTokenId(tokenResponse.id);
     }

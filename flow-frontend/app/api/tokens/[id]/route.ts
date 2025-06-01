@@ -1,33 +1,48 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { authenticatePrivyUser } from "@/lib/api/auth"
+// app/api/tokens/[tokenId]/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { calculateTokenPrice } from "@/lib/pricing";
+import { supabase } from "@/lib/supabase";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const authResult = await authenticatePrivyUser(req)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { tokenId: string } }
+) {
+  const tokenId = params.tokenId;
 
-  if (!authResult.authenticated) {
-    console.log(`Authentication failed: ${authResult.error}`)
-    return NextResponse.json({ success: false, message: authResult.error }, { status: 401 })
+  const { data: token } = await supabase
+    .from("tokens")
+    .select("*")
+    .eq("id", tokenId)
+    .single();
+
+  if (!token) {
+    return NextResponse.json({ error: "Token not found" }, { status: 404 });
   }
 
-  // Mock data for a single token
-  const token = {
-    id: params.id,
-    name: "Moon Rocket",
-    symbol: "MOON",
-    emoji: "🚀",
-    description:
-      "To the moon! This is the most fun token in the galaxy. Join us on our journey to explore the crypto universe!",
-    price: 0.0234,
-    priceChange24h: 45.67,
-    marketCap: 2340000,
-    volume24h: 567000,
-    holders: 1234,
-    rank: 1,
-    createdAt: new Date().toISOString(),
-    creatorAddress: "0x1234...5678",
-    contractAddress: "0xabcd...efgh",
-    chainId: 1,
-  }
+  // Get transactions for current supply and price calculation
+  const { data: transactions } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("token_id", tokenId)
+    .order("timestamp", { ascending: true });
 
-  return NextResponse.json({ success: true, token })
+  const currentSupply =
+    transactions?.reduce((sum, tx) => {
+      return tx.action === "BUY"
+        ? sum + Number(tx.token_amount)
+        : sum - Number(tx.token_amount);
+    }, 0) || 0;
+
+  const currentPrice = calculateTokenPrice({
+    liquidityAmount: Number(token.liquidity_amount),
+    totalSupply: Number(token.total_supply),
+    currentSupply,
+  });
+
+  return NextResponse.json({
+    ...token,
+    currentSupply,
+    currentPrice,
+    transactions: transactions || [],
+  });
 }
