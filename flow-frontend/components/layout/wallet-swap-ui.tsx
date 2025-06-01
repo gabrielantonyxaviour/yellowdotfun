@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { ChevronDown } from "lucide-react";
 import { formatEther } from "viem";
-import { isTesting, publicClient } from "@/lib/constants";
-import { useNitrolite } from "@/hooks/use-nitrolite";
+import { publicClient } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 
 interface TokenBalance {
@@ -29,9 +28,7 @@ export function WalletSwapUI({
 }) {
   const { address } = useAccount();
   const [fromToken, setFromToken] = useState<"USD" | "FLOW" | "WORLD">("USD");
-  const [toToken, setToToken] = useState<"USD" | "FLOW" | "WORLD">(
-    isTesting ? "WORLD" : "FLOW"
-  );
+  const [toToken, setToToken] = useState<"USD" | "FLOW" | "WORLD">("FLOW");
   const [amount, setAmount] = useState("");
   const [toAmount, setToAmount] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
@@ -85,7 +82,7 @@ export function WalletSwapUI({
     const fetchPrices = async () => {
       try {
         const response = await fetch(
-          "/api/token-price?token=" + (isTesting ? "ETH" : "FLOW")
+          "/api/token-price?token=" +  "FLOW"
         );
         const data = await response.json();
         setPrices({

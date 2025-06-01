@@ -7,9 +7,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { flowMainnet, worldchain, worldchainSepolia } from "viem/chains";
 import { WagmiProvider } from "wagmi";
 import { config } from "@/lib/wagmi-config";
-import { isTesting } from "@/lib/constants";
-
-export const chains = isTesting ? [worldchain] : [flowMainnet];
 
 const queryClient = new QueryClient();
 
@@ -23,8 +20,8 @@ export function PrivyProviderWrapper({
       <PrivyProvider
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
         config={{
-          supportedChains: chains,
-          defaultChain: isTesting ? worldchain : flowMainnet,
+          supportedChains: [flowMainnet],
+          defaultChain: flowMainnet,
           appearance: {
             theme: "dark",
             accentColor: "#FFD700",
@@ -33,7 +30,7 @@ export function PrivyProviderWrapper({
           loginMethods: ["wallet", "email"],
           fundingMethodConfig: {
             moonpay: {
-              useSandbox: isTesting,
+              useSandbox: false,
             },
           },
           walletConnectCloudProjectId:

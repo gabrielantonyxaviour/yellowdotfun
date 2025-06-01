@@ -11,7 +11,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { Account, Address, createWalletClient, custom, Hex } from "viem";
 import { worldchain } from "viem/chains";
-import { DEFAULT_EXPIRY, isTesting } from "@/lib/constants";
+import { DEFAULT_EXPIRY } from "@/lib/constants";
 import { flowMainnet } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { useAccount } from "wagmi";
@@ -72,7 +72,7 @@ export const useNitrolite = () => {
     const address = await signer.getAddress();
 
     const walletClient = createWalletClient({
-      chain: isTesting ? worldchain : flowMainnet,
+      chain: flowMainnet,
       transport: custom(window.ethereum),
       account: address as Address,
     });

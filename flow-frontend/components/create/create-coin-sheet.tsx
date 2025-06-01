@@ -28,6 +28,7 @@ import { useState } from "react";
 import { useNitrolite } from "@/hooks/use-nitrolite";
 import { ethers } from "ethers";
 import { Address } from "viem";
+import { useRouter } from "next/router";
 
 interface FormData {
   name: string;
@@ -44,20 +45,23 @@ interface FormData {
 export function CreateCoinSheet() {
   const [step, setStep] = useState(1);
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const { participants, createAppSession, closeAppSession } = useNitrolite();
+  const [tokenId, setTokenId] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
-    name: "",
-    symbol: "",
+    name: "Real Meme",
+    symbol: "RMEME",
     image: null,
-    description: "",
-    twitter: "",
-    telegram: "",
-    website: "",
+    description: "Real Meme is a meme coin that is real",
+    twitter: "https://twitter.com/realmeme",
+    telegram: "https://t.me/realmeme",
+    website: "https://realmeme.com",
     creatorPercentage: [10],
-    liquidityAmount: "",
+    liquidityAmount: "0.0001",
   });
 
   const totalSteps = 4;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -74,10 +78,18 @@ export function CreateCoinSheet() {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
+    console.log("Starting token creation process...");
+    console.log("Form data:", formData);
+
+    console.log("Initializing Ethereum provider...");
     const provider = new ethers.BrowserProvider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
     const address = await signer.getAddress();
+    console.log("Connected wallet address:", address);
+
+    console.log("Preparing pre-allocation changes...");
     const preAllocationChanges = [
       {
         participant: address as Address,
@@ -85,7 +97,13 @@ export function CreateCoinSheet() {
         amount: formData.liquidityAmount,
       },
     ];
+    console.log("Pre-allocation changes:", preAllocationChanges);
+
+    console.log("Creating app session...");
     await createAppSession(preAllocationChanges);
+    console.log("App session created successfully");
+
+    console.log("Preparing post-allocation changes...");
     const postAllocationChanges = [
       {
         participant: address as Address,
@@ -96,16 +114,26 @@ export function CreateCoinSheet() {
         ).toString(),
       },
     ];
+    console.log("Post-allocation changes:", postAllocationChanges);
+
+    console.log("Closing app session...");
     await closeAppSession(postAllocationChanges);
+    console.log("App session closed successfully");
+
     let imageUrl = "";
-    if (formData.image) {
-      const imageRequst = await fetch("/api/pinata/image", {
-        method: "POST",
-        body: formData.image,
-      });
-      const imageResponse = await imageRequst.json();
-      imageUrl = imageResponse.url;
-    }
+    // if (formData.image) {
+    //   const uploadFormData = new FormData();
+    //   uploadFormData.append("file", formData.image);
+    //   console.log("Uploading image to Pinata...");
+    //   const imageRequst = await fetch("/api/supabase/image", {
+    //     method: "POST",
+    //     body: uploadFormData,
+    //   });
+    //   const imageResponse = await imageRequst.json();
+    //   imageUrl = imageResponse.url;
+    //   console.log("Image uploaded successfully:", imageUrl);
+    // }
+
     interface CreateTokenRequest {
       token_name: string;
       token_symbol: string;
@@ -116,6 +144,8 @@ export function CreateCoinSheet() {
       telegram?: string;
       website?: string;
     }
+
+    console.log("Preparing token data...");
     const tokenData: CreateTokenRequest = {
       token_name: formData.name,
       token_symbol: formData.symbol,
@@ -126,19 +156,32 @@ export function CreateCoinSheet() {
       telegram: formData.telegram,
       website: formData.website,
     };
+    console.log("Token data prepared:", tokenData);
 
+    console.log("Sending token creation request...");
     const tokenRequest = await fetch("/api/tokens", {
       method: "POST",
       body: JSON.stringify(tokenData),
     });
     const tokenResponse = await tokenRequest.json();
-    console.log(tokenResponse);
+
     if (tokenResponse.error) {
       console.error("Token creation failed:", tokenResponse.error);
+      console.error("Full error response:", tokenResponse);
     } else {
       console.log("Token created successfully:", tokenResponse);
+      console.log("Token details:", {
+        name: tokenData.token_name,
+        symbol: tokenData.token_symbol,
+        creatorAllocation: tokenData.creator_allocation,
+        liquidityAmount: tokenData.initial_liquidity_amount,
+      });
+      setTokenId(tokenResponse.id);
     }
+
+    console.log("Moving to success step...");
     setStep(5);
+    setIsLoading(false);
   };
 
   const isStep1Valid = formData.name && formData.symbol && formData.image;
@@ -512,9 +555,16 @@ export function CreateCoinSheet() {
                 <Button
                   onClick={handleSubmit}
                   className="flex-1 yellow-button py-4 font-bold rounded-xl"
-                  disabled={!isStep4Valid}
+                  disabled={!isStep4Valid || isLoading}
                 >
-                  Create Coin
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Creating...
+                    </div>
+                  ) : (
+                    "Create Coin"
+                  )}
                 </Button>
               </div>
             </div>
@@ -540,16 +590,24 @@ export function CreateCoinSheet() {
                 <p className="font-bold text-white mb-2">
                   {formData.name} (${formData.symbol})
                 </p>
-                <p className="text-sm text-stone-400 mb-2">
-                  Contract: 0x1234...5678
-                </p>
+
                 <p className="text-sm text-stone-400">
-                  Your allocation: {formData.creatorPercentage[0]}%
+                  Your allocation:{" "}
+                  {(
+                    (formData.creatorPercentage[0] * 1_000_000_000) /
+                    100
+                  ).toLocaleString()}{" "}
+                  ${formData.symbol}
                 </p>
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full yellow-button py-4 font-bold rounded-xl">
+                <Button
+                  className="w-full yellow-button py-4 font-bold rounded-xl"
+                  onClick={() => {
+                    router.push(`/token/${tokenId}`);
+                  }}
+                >
                   View Your Coin
                 </Button>
                 <Button
