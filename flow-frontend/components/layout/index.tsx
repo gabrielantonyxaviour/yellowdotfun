@@ -14,11 +14,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     authenticateUser,
     hasChannel,
     isAuthenticated,
+    usdBalance,
   } = useNitrolite();
 
   return address && hasChannel ? (
     <div className="min-h-screen bg-black">
       <AppHeader
+        usdBalance={usdBalance}
         connectionStatus={connectionStatus}
         connectToWebSocket={connectToWebSocket}
       />

@@ -8,14 +8,15 @@ import { useState } from "react";
 import WalletSheet from "./wallet-sheet";
 
 export function AppHeader({
+  usdBalance,
   connectionStatus,
   connectToWebSocket,
 }: {
+  usdBalance: number;
   connectionStatus: string;
   connectToWebSocket: () => void;
 }) {
   const { address } = useAccount();
-  const [balance, setBalance] = useState(1244);
   const { disconnectAsync } = useDisconnect();
   const handleLogout = async () => {
     try {
@@ -36,6 +37,7 @@ export function AppHeader({
 
           <div className="flex items-center space-x-4">
             <WalletSheet
+              usdBalance={usdBalance}
               connectionStatus={connectionStatus}
               connectToWebSocket={connectToWebSocket}
             />

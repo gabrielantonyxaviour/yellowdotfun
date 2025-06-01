@@ -25,6 +25,9 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
+import { useNitrolite } from "@/hooks/use-nitrolite";
+import { ethers } from "ethers";
+import { Address } from "viem";
 
 interface FormData {
   name: string;
@@ -41,6 +44,7 @@ interface FormData {
 export function CreateCoinSheet() {
   const [step, setStep] = useState(1);
   const [open, setOpen] = useState(false);
+  const { participants, createAppSession, closeAppSession } = useNitrolite();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     symbol: "",
@@ -70,8 +74,71 @@ export function CreateCoinSheet() {
   };
 
   const handleSubmit = async () => {
-    console.log("Creating coin:", formData);
-    setStep(5); // Success step
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    const preAllocationChanges = [
+      {
+        participant: address as Address,
+        asset: "usdc",
+        amount: formData.liquidityAmount,
+      },
+    ];
+    await createAppSession(preAllocationChanges);
+    const postAllocationChanges = [
+      {
+        participant: address as Address,
+        asset: formData.symbol,
+        amount: (
+          (formData.creatorPercentage[0] * 1_000_000_000) /
+          100
+        ).toString(),
+      },
+    ];
+    await closeAppSession(postAllocationChanges);
+    let imageUrl = "";
+    if (formData.image) {
+      const imageRequst = await fetch("/api/pinata/image", {
+        method: "POST",
+        body: formData.image,
+      });
+      const imageResponse = await imageRequst.json();
+      imageUrl = imageResponse.url;
+    }
+    interface CreateTokenRequest {
+      token_name: string;
+      token_symbol: string;
+      token_image?: string;
+      creator_allocation?: number;
+      initial_liquidity_amount: number;
+      twitter?: string;
+      telegram?: string;
+      website?: string;
+    }
+    const tokenData: CreateTokenRequest = {
+      token_name: formData.name,
+      token_symbol: formData.symbol,
+      token_image: imageUrl,
+      creator_allocation: formData.creatorPercentage[0],
+      initial_liquidity_amount: parseFloat(formData.liquidityAmount),
+      twitter: formData.twitter,
+      telegram: formData.telegram,
+      website: formData.website,
+    };
+
+    const tokenRequest = await fetch("/api/tokens", {
+      method: "POST",
+      body: JSON.stringify(tokenData),
+    });
+    const tokenResponse = await tokenRequest.json();
+    console.log(tokenResponse);
+    if (tokenResponse.error) {
+      console.error("Token creation failed:", tokenResponse.error);
+    } else {
+      console.log("Token created successfully:", tokenResponse);
+    }
+    setStep(5);
   };
 
   const isStep1Valid = formData.name && formData.symbol && formData.image;
@@ -396,9 +463,6 @@ export function CreateCoinSheet() {
                     }
                     min="100"
                   />
-                  <p className="text-xs text-stone-400">
-                    Minimum $5 required for initial liquidity
-                  </p>
                 </div>
 
                 <div className="bg-stone-800 border-2 border-stone-600 rounded-xl p-4">
@@ -429,7 +493,7 @@ export function CreateCoinSheet() {
                     <div className="flex justify-between text-sm border-t border-stone-600 pt-1.5">
                       <span className="text-stone-400">Total Cost:</span>
                       <span className="font-bold text-white">
-                        ${Number(formData.liquidityAmount) + 1}
+                        ${Number(formData.liquidityAmount)}
                       </span>
                     </div>
                   </div>

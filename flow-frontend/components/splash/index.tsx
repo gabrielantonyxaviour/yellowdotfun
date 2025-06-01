@@ -38,15 +38,6 @@ export function SplashScreen({
     }
   };
 
-  const handleCreateChannel = async () => {
-    try {
-      setLoading(true);
-      // TODO: Create a channel
-    } catch (error) {
-      console.error("Create channel error:", error);
-    }
-  };
-
   const handleAuthenticateChannel = async () => {
     try {
       setLoading(true);
@@ -90,42 +81,22 @@ export function SplashScreen({
           />
           <p className="text-sm font-semibold">Sign in with Flow</p>
         </Button>
-      ) : !isAuthenticated ? (
-        <Button
-          onClick={handleAuthenticateChannel}
-          disabled={loading}
-          className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
-        >
-          <Image
-            src="/yellow.jpg"
-            alt="Yellow"
-            width={20}
-            height={20}
-            className="rounded-full"
-          />
-          <p className="text-sm font-semibold">Authenticate your Channel</p>
-        </Button>
       ) : (
-        hasChannel == false && (
-          <>
-            <p className="text-md text-center pb-4 font-medium text-black/80 max-w-sm leading-relaxed">
-              You don't have a channel yet. Create one to start trading.
-            </p>
-            <Button
-              onClick={handleCreateChannel}
-              disabled={loading}
-              className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
-            >
-              <Image
-                src="/yellow.jpg"
-                alt="Yellow"
-                width={20}
-                height={20}
-                className="rounded-full"
-              />
-              <p className="text-sm font-semibold">Create a channel</p>
-            </Button>
-          </>
+        !isAuthenticated && (
+          <Button
+            onClick={handleAuthenticateChannel}
+            disabled={loading}
+            className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
+          >
+            <Image
+              src="/yellow.jpg"
+              alt="Yellow"
+              width={20}
+              height={20}
+              className="rounded-full"
+            />
+            <p className="text-sm font-semibold">Authenticate your Channel</p>
+          </Button>
         )
       )}
     </div>

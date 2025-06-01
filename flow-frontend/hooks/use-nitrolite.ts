@@ -158,12 +158,22 @@ export const useNitrolite = () => {
           console.log("Authentication successful");
           setIsAuthenticated(true);
           if (message.res[2][0].length > 0) {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = await provider.getSigner();
+            const address = await signer.getAddress();
             setHasChannel(true);
-            await addParticipantToDatabase(address as Address);
+            await addParticipantToDatabase(address);
             await loadParticipants();
           } else {
             setHasChannel(false);
           }
+        } else if (message.res && message.res[1] === "bu") {
+          console.log("State Ledger:", message.res[2]);
+          setUsdBalance(
+            message.res[2][0].filter((item: any) => item.asset === "usdc")[0]
+              .amount
+          );
         } else if (message.res && message.res[1] === "auth_failure") {
           console.error("Authentication failed:", message.res[2]);
           setError(`Authentication failed: ${message.res[2]}`);
@@ -287,62 +297,103 @@ export const useNitrolite = () => {
     }
   };
 
-  const createAppSession = useCallback(async () => {
-    if (!ws || !walletRef.current || participants.length < 2) {
-      setError("Need at least 2 participants to create session");
-      return;
-    }
+  const createAppSession = useCallback(
+    async (allocationChanges: Allocation[]) => {
+      if (!ws || !walletRef.current || participants.length < 2) {
+        setError("Need at least 2 participants to create session");
+        return;
+      }
 
-    try {
-      const appDefinition = {
-        protocol: "nitroliterpc",
-        participants: participants.map((p) => p.address as Address),
-        weights: [100, ...Array(participants.length - 1).fill(0)],
-        quorum: 100,
-        challenge: 0,
-        nonce: Date.now(),
-      };
+      try {
+        const appDefinition = {
+          protocol: "nitroliterpc",
+          participants: participants.map((p) => p.address as Address),
+          weights: [100, ...Array(participants.length - 1).fill(0)],
+          quorum: 100,
+          challenge: 0,
+          nonce: Date.now(),
+        };
 
-      const allocations = participants.map((p) => ({
-        participant: p.address as Address,
-        asset: "usdc",
-        amount: "0",
-      }));
+        const allocations = participants.map((p) => ({
+          participant: p.address as Address,
+          asset: "usdc",
+          amount: "0",
+        }));
 
-      const signedMessage = await createAppSessionMessage(messageSigner, [
-        {
-          definition: appDefinition,
+        for (const change of allocationChanges) {
+          const existing = allocations.find(
+            (a) =>
+              a.participant === change.participant && a.asset === change.asset
+          );
+          if (existing) {
+            existing.amount = change.amount;
+          } else {
+            allocations.push(change);
+          }
+        }
+
+        console.log("Allocations:", allocations);
+
+        const signedMessage = await createAppSessionMessage(messageSigner, [
+          {
+            definition: appDefinition,
+            allocations,
+          },
+        ]);
+
+        ws.send(signedMessage);
+      } catch (err) {
+        setError(`Error creating session: ${err}`);
+      }
+    },
+    [ws, participants, messageSigner]
+  );
+
+  const closeAppSession = useCallback(
+    async (allocationChanges: Allocation[]) => {
+      if (!ws || !currentSession || !walletRef.current) {
+        setError("No active session to close");
+        return;
+      }
+
+      try {
+        const allocations = participants.map((p) => ({
+          participant: p.address as Address,
+          asset: "usdc",
+          amount: "0",
+        }));
+
+        for (const change of allocationChanges) {
+          const existing = allocations.find(
+            (a) =>
+              a.participant === change.participant && a.asset === change.asset
+          );
+          if (existing) {
+            existing.amount = change.amount;
+          } else {
+            allocations.push(change);
+          }
+        }
+
+        console.log("Allocations:", allocations);
+
+        const closeRequest = {
+          app_session_id: currentSession.id as Hex,
           allocations,
-        },
-      ]);
+        };
 
-      ws.send(signedMessage);
-    } catch (err) {
-      setError(`Error creating session: ${err}`);
-    }
-  }, [ws, participants, messageSigner]);
+        const signedMessage = await createCloseAppSessionMessage(
+          messageSigner,
+          [closeRequest]
+        );
 
-  const closeAppSession = useCallback(async () => {
-    if (!ws || !currentSession || !walletRef.current) {
-      setError("No active session to close");
-      return;
-    }
-
-    try {
-      const closeRequest = {
-        app_session_id: currentSession.id as Hex,
-        allocations,
-      };
-
-      const signedMessage = await createCloseAppSessionMessage(messageSigner, [
-        closeRequest,
-      ]);
-
-      ws.send(signedMessage);
-    } catch (err) {
-      setError(`Error closing session: ${err}`);
-    }
-  }, [ws, currentSession, allocations, messageSigner]);
+        ws.send(signedMessage);
+      } catch (err) {
+        setError(`Error closing session: ${err}`);
+      }
+    },
+    [ws, currentSession, allocations, messageSigner]
+  );
 
   const updateAllocation = useCallback(
     (participant: string, asset: string, amount: string) => {

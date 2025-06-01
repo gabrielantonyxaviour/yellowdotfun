@@ -396,9 +396,6 @@ export function CreateCoinSheet() {
                     }
                     min="100"
                   />
-                  <p className="text-xs text-stone-400">
-                    Minimum $5 required for initial liquidity
-                  </p>
                 </div>
 
                 <div className="bg-stone-800 border-2 border-stone-600 rounded-xl p-4">
@@ -429,7 +426,7 @@ export function CreateCoinSheet() {
                     <div className="flex justify-between text-sm border-t border-stone-600 pt-1.5">
                       <span className="text-stone-400">Total Cost:</span>
                       <span className="font-bold text-white">
-                        ${Number(formData.liquidityAmount) + 1}
+                        ${Number(formData.liquidityAmount)}
                       </span>
                     </div>
                   </div>
