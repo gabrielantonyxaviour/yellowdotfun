@@ -1,14 +1,9 @@
-import { createPublicClient, createWalletClient, custom, http } from "viem";
-import { flowMainnet, worldchain } from "viem/chains";
+import { createPublicClient, http } from "viem";
+import { flowMainnet } from "viem/chains";
 
 export const publicClient = createPublicClient({
   chain: flowMainnet,
   transport: http(),
-});
-
-export const walletClient = createWalletClient({
-  chain: flowMainnet,
-  transport: custom(window.ethereum),
 });
 
 export const DEFAULT_EXPIRY = Math.floor(Date.now() / 1000) + 3600;

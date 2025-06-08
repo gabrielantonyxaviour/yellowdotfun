@@ -15,6 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     connectionStatus,
     connectToWebSocket,
     authenticateUser,
+    createChannel,
     hasChannel,
     isAuthenticated,
     usdBalance,
@@ -32,11 +33,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ) : (
     <SplashScreen
       isAuthenticated={isAuthenticated}
+      walletClient={walletClient}
       logout={() => {
         logout();
       }}
       hasChannel={hasChannel}
       authenticateUser={authenticateUser}
+      createChannel={createChannel}
       connectionStatus={connectionStatus}
       connectToWebSocket={connectToWebSocket}
     />

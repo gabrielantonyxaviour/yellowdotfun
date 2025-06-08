@@ -6,13 +6,14 @@ import {
   createAuthVerifyMessage,
   createAppSessionMessage,
   createCloseAppSessionMessage,
-  createGetChannelsMessage,
+  NitroliteClient,
 } from "@erc7824/nitrolite";
 import { supabase } from "@/lib/supabase";
-import { Address, Hex, WalletClient } from "viem";
-import { DEFAULT_EXPIRY } from "@/lib/constants";
-import { useAccount, useWalletClient } from "wagmi";
+import { Address, createWalletClient, Hex, http, WalletClient } from "viem";
+import { DEFAULT_EXPIRY, publicClient } from "@/lib/constants";
 import { validateChallenge } from "@/lib/utils";
+import { flowMainnet } from "viem/chains";
+import { privateKeyToAccount } from "viem/accounts";
 
 interface Participant {
   address: string;
@@ -47,6 +48,10 @@ export const useNitrolite = (
   const [error, setError] = useState<string | null>(null);
   const [usdBalance, setUsdBalance] = useState<number>(0);
   const [hasChannel, setHasChannel] = useState<boolean | null>(null);
+  const [stateWalletClient, setStateWalletClient] =
+    useState<WalletClient | null>(null);
+  const [nitroliteClient, setNitroliteClient] =
+    useState<NitroliteClient | null>(null);
 
   const walletRef = useRef<ethers.Wallet | null>(null);
 
@@ -166,10 +171,14 @@ export const useNitrolite = (
           }
         } else if (message.res && message.res[1] === "bu") {
           console.log("State Ledger:", message.res[2]);
-          setUsdBalance(
-            message.res[2][0].filter((item: any) => item.asset === "usdc")[0]
-              .amount
-          );
+          if (message.res[2][0].length > 0) {
+            setUsdBalance(
+              message.res[2][0].filter((item: any) => item.asset === "usdc")[0]
+                .amount
+            );
+          } else {
+            setUsdBalance(0);
+          }
         } else if (message.res && message.res[1] === "auth_failure") {
           console.error("Authentication failed:", message.res[2]);
           setError(`Authentication failed: ${message.res[2]}`);
@@ -206,7 +215,7 @@ export const useNitrolite = (
       setConnectionStatus("disconnected");
       setIsAuthenticated(false);
     };
-  }, [ws, messageSigner, address, participants]);
+  }, [ws, messageSigner, address, participants, walletClient]);
 
   const authenticateUser = useCallback(async () => {
     console.log("Starting authentication process");
@@ -223,6 +232,15 @@ export const useNitrolite = (
 
       console.log("Creating signing wallet");
       const privateKey = ethers.randomBytes(32);
+      const stateWalletAccount = privateKeyToAccount(
+        ethers.hexlify(privateKey) as Hex
+      );
+      const _stateWalletClient = createWalletClient({
+        account: stateWalletAccount,
+        chain: flowMainnet,
+        transport: http(),
+      });
+      setStateWalletClient(_stateWalletClient);
       const wallet = new ethers.Wallet(ethers.hexlify(privateKey));
       console.log("Generated wallet address:", wallet.address);
       walletRef.current = wallet;
@@ -232,6 +250,36 @@ export const useNitrolite = (
         setError("WebSocket not connected");
         return;
       }
+
+      console.log("Creating Nitrolite client with config:", {
+        publicClient,
+        walletClient: walletClient as any,
+        stateWalletClient: _stateWalletClient as any,
+        chainId: flowMainnet.id,
+        addresses: {
+          custody: "0x6258dCa1DF894980a8778197c60893a9fa2b5eF8",
+          guestAddress: "0x0429A2Da7884CA14E53142988D5845952fE4DF6a",
+          tokenAddress: "0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED",
+          adjudicator: "0xEd44dba5ECB7928032649EF0075258FA3aca508B",
+        },
+        challengeDuration: BigInt("3600"),
+      });
+
+      setNitroliteClient(
+        new NitroliteClient({
+          publicClient,
+          walletClient: walletClient as any,
+          stateWalletClient: _stateWalletClient as any,
+          chainId: flowMainnet.id,
+          addresses: {
+            custody: "0x6258dCa1DF894980a8778197c60893a9fa2b5eF8",
+            guestAddress: "0x0429A2Da7884CA14E53142988D5845952fE4DF6a",
+            tokenAddress: "0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED",
+            adjudicator: "0xEd44dba5ECB7928032649EF0075258FA3aca508B",
+          },
+          challengeDuration: BigInt("3600"),
+        })
+      );
 
       console.log("Creating auth request message");
       const authRequest = await createAuthRequestMessage({
@@ -253,6 +301,38 @@ export const useNitrolite = (
       setError(`Authentication error: ${err}`);
     }
   }, [ws]);
+
+  const createChannel = useCallback(
+    async (
+      amount: string
+    ): Promise<{
+      depositTxHash: string;
+      createChannelTxHash: string;
+    }> => {
+      if (!nitroliteClient) {
+        console.log("Nitrolite client is not initialized");
+        return {
+          depositTxHash: "",
+          createChannelTxHash: "",
+        };
+      }
+
+      const { txHash } = await nitroliteClient.createChannel({
+        initialAllocationAmounts: [BigInt(amount), BigInt(0)],
+        stateData: "0x",
+      });
+
+      console.log("Channel created");
+      console.log("Deposit tx hash:", txHash);
+      console.log("Create channel tx hash:", txHash);
+      return {
+        depositTxHash: txHash,
+        createChannelTxHash: txHash,
+      };
+    },
+
+    [nitroliteClient]
+  );
 
   const addParticipantToDatabase = async (address: string) => {
     try {
@@ -428,6 +508,7 @@ export const useNitrolite = (
     setHasChannel,
     setIsAuthenticated,
     connectToWebSocket,
+    createChannel,
     authenticateUser,
     createAppSession,
     closeAppSession,
