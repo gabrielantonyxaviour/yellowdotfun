@@ -2,7 +2,7 @@
 
 import { AppHeader } from "./app-header";
 import { SplashScreen } from "../splash";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { useNitrolite } from "@/hooks/use-nitrolite";
 import { Address } from "viem";
 import { usePrivy } from "@privy-io/react-auth";
@@ -10,6 +10,7 @@ import { usePrivy } from "@privy-io/react-auth";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { address } = useAccount();
   const { logout } = usePrivy();
+  const { data: walletClient } = useWalletClient();
   const {
     connectionStatus,
     connectToWebSocket,
@@ -17,8 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     hasChannel,
     isAuthenticated,
     usdBalance,
-    setIsAuthenticated,
-  } = useNitrolite();
+  } = useNitrolite(address, walletClient);
 
   return address && hasChannel ? (
     <div className="min-h-screen bg-black">
@@ -33,7 +33,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SplashScreen
       isAuthenticated={isAuthenticated}
       logout={() => {
-        setIsAuthenticated(false);
         logout();
       }}
       hasChannel={hasChannel}

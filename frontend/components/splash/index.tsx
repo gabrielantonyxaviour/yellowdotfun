@@ -2,9 +2,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { Badge } from "../ui/badge";
 import { Loader2, LogOut } from "lucide-react";
 import { useConnectWallet, usePrivy } from "@privy-io/react-auth";
@@ -25,23 +25,28 @@ export function SplashScreen({
   connectToWebSocket: () => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const { authenticated, login } = usePrivy();
+  const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
-  const { connectWallet } = useConnectWallet({
-    onSuccess: ({ wallet }) => {
+
+  useEffect(() => {
+    if (authenticated) {
       connectToWebSocket();
       setLoading(false);
-      console.log(wallet);
-    },
-    onError: (error) => {
-      console.log(error);
-      setLoading(false);
-    },
-  });
+    }
+  }, [authenticated]);
+
+  useEffect(() => {
+    console.log("Wallet Client");
+    console.log(walletClient);
+    console.log("Address");
+    console.log(address);
+  }, [walletClient, address]);
 
   const handleLogin = async () => {
     try {
       setLoading(true);
-      connectWallet();
+      login();
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
@@ -49,6 +54,10 @@ export function SplashScreen({
   };
 
   const handleAuthenticateChannel = async () => {
+    if (!address) {
+      console.log("No address");
+      return;
+    }
     try {
       setLoading(true);
       authenticateUser();
@@ -76,7 +85,7 @@ export function SplashScreen({
         </p>
       </div>
 
-      {address && (
+      {authenticated && (
         <Badge
           className={`${
             connectionStatus === "connected"
@@ -94,7 +103,7 @@ export function SplashScreen({
           {connectionStatus}
         </Badge>
       )}
-      {!address ? (
+      {!authenticated ? (
         <Button
           onClick={handleLogin}
           disabled={loading}
@@ -121,7 +130,13 @@ export function SplashScreen({
                 height={20}
                 className="rounded-full"
               />
-              <p className="text-sm font-semibold">Authenticate your Channel</p>
+              {loading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <p className="text-sm font-semibold">
+                  Authenticate your Channel
+                </p>
+              )}
             </Button>
             <button
               className="p-1 hover:bg-black/10 rounded hover:bg-transparent"

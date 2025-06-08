@@ -9,11 +9,8 @@ import {
   createGetChannelsMessage,
 } from "@erc7824/nitrolite";
 import { supabase } from "@/lib/supabase";
-import { Account, Address, createWalletClient, custom, Hex } from "viem";
-import { worldchain } from "viem/chains";
+import { Address, Hex, WalletClient } from "viem";
 import { DEFAULT_EXPIRY } from "@/lib/constants";
-import { flowMainnet } from "viem/chains";
-import { privateKeyToAccount } from "viem/accounts";
 import { useAccount, useWalletClient } from "wagmi";
 import { validateChallenge } from "@/lib/utils";
 
@@ -35,7 +32,10 @@ interface Allocation {
   amount: string;
 }
 
-export const useNitrolite = () => {
+export const useNitrolite = (
+  address?: Address,
+  walletClient?: WalletClient
+) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<
     "disconnected" | "connecting" | "connected"
@@ -47,67 +47,76 @@ export const useNitrolite = () => {
   const [error, setError] = useState<string | null>(null);
   const [usdBalance, setUsdBalance] = useState<number>(0);
   const [hasChannel, setHasChannel] = useState<boolean | null>(null);
-  const { data: walletClient } = useWalletClient();
-
-  const { address } = useAccount();
 
   const walletRef = useRef<ethers.Wallet | null>(null);
 
-  const messageSigner = useCallback(async (payload: any) => {
-    if (!walletRef.current) throw new Error("Wallet not initialized");
+  const messageSigner = useCallback(
+    async (payload: any) => {
+      if (!walletRef.current) throw new Error("Wallet not initialized");
 
-    const message = JSON.stringify(payload);
-    const digestHex = ethers.id(message);
-    const messageBytes = ethers.getBytes(digestHex);
-    const { serialized: signature } =
-      walletRef.current.signingKey.sign(messageBytes);
-    return signature as Hex;
-  }, []);
+      const message = JSON.stringify(payload);
+      const digestHex = ethers.id(message);
+      const messageBytes = ethers.getBytes(digestHex);
+      const { serialized: signature } =
+        walletRef.current.signingKey.sign(messageBytes);
+      return signature as Hex;
+    },
+    [walletRef]
+  );
 
-  const browserSigner = useCallback(async (payload: any) => {
-    if (!walletClient) throw new Error("Wallet client not initialized");
-    const challenge = validateChallenge(payload);
+  const browserSigner = useCallback(
+    async (payload: any) => {
+      console.log("walletClient", walletClient);
+      console.log("walletClient.account", walletClient?.account);
+      console.log("walletRef", walletRef.current);
 
-    const walletAddress = walletClient.account.address;
+      if (!walletClient || !walletClient.account)
+        throw new Error("Wallet client not initialized");
 
-    const message = {
-      challenge: challenge,
-      scope: "console",
-      wallet: walletAddress,
-      application: walletAddress, // Your application address
-      participant: walletRef.current?.address as Address, // The address of the signer
-      expire: DEFAULT_EXPIRY.toString(), // 1 hour expiration
-      allowances: [],
-    };
+      const challenge = validateChallenge(payload);
 
-    const AUTH_TYPES = {
-      Policy: [
-        { name: "challenge", type: "string" },
-        { name: "scope", type: "string" },
-        { name: "wallet", type: "address" },
-        { name: "application", type: "address" },
-        { name: "participant", type: "address" },
-        { name: "expire", type: "uint256" },
-        { name: "allowances", type: "Allowance[]" },
-      ],
-      Allowance: [
-        { name: "asset", type: "string" },
-        { name: "amount", type: "uint256" },
-      ],
-    };
+      const walletAddress = walletClient.account.address;
 
-    const signature = await walletClient.signTypedData({
-      account: walletClient.account!,
-      domain: {
-        name: "yellow.fun",
-      },
-      types: AUTH_TYPES,
-      primaryType: "Policy",
-      message: message,
-    });
+      const message = {
+        challenge: challenge,
+        scope: "console",
+        wallet: walletAddress,
+        application: walletAddress, // Your application address
+        participant: walletRef.current?.address as Address, // The address of the signer
+        expire: DEFAULT_EXPIRY.toString(), // 1 hour expiration
+        allowances: [],
+      };
 
-    return signature;
-  }, []);
+      const AUTH_TYPES = {
+        Policy: [
+          { name: "challenge", type: "string" },
+          { name: "scope", type: "string" },
+          { name: "wallet", type: "address" },
+          { name: "application", type: "address" },
+          { name: "participant", type: "address" },
+          { name: "expire", type: "uint256" },
+          { name: "allowances", type: "Allowance[]" },
+        ],
+        Allowance: [
+          { name: "asset", type: "string" },
+          { name: "amount", type: "uint256" },
+        ],
+      };
+
+      const signature = await walletClient.signTypedData({
+        account: walletClient.account!,
+        domain: {
+          name: "yellow.fun",
+        },
+        types: AUTH_TYPES,
+        primaryType: "Policy",
+        message: message,
+      });
+
+      return signature;
+    },
+    [walletClient, walletRef]
+  );
 
   const connectToWebSocket = useCallback(() => {
     console.log("Starting WebSocket connection");
@@ -203,6 +212,7 @@ export const useNitrolite = () => {
     console.log("Starting authentication process");
 
     if (!address) {
+      console.log("No wallet connected");
       setError("No wallet connected");
       return;
     }
