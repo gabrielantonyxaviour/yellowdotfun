@@ -14,7 +14,7 @@ import { worldchain } from "viem/chains";
 import { DEFAULT_EXPIRY } from "@/lib/constants";
 import { flowMainnet } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { validateChallenge } from "@/lib/utils";
 
 interface Participant {
@@ -45,10 +45,11 @@ export const useNitrolite = () => {
   const [currentSession, setCurrentSession] = useState<AppSession | null>(null);
   const [allocations, setAllocations] = useState<Allocation[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [userAddress, setUserAddress] = useState<string | null>(null);
   const [usdBalance, setUsdBalance] = useState<number>(0);
   const [hasChannel, setHasChannel] = useState<boolean | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+  const { data: walletClient } = useWalletClient();
+
+  const { address } = useAccount();
 
   const walletRef = useRef<ethers.Wallet | null>(null);
 
@@ -64,18 +65,8 @@ export const useNitrolite = () => {
   }, []);
 
   const browserSigner = useCallback(async (payload: any) => {
+    if (!walletClient) throw new Error("Wallet client not initialized");
     const challenge = validateChallenge(payload);
-
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-
-    const walletClient = createWalletClient({
-      chain: flowMainnet,
-      transport: custom(window.ethereum),
-      account: address as Address,
-    });
 
     const walletAddress = walletClient.account.address;
 
@@ -158,12 +149,8 @@ export const useNitrolite = () => {
           console.log("Authentication successful");
           setIsAuthenticated(true);
           if (message.res[2][0].length > 0) {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = await provider.getSigner();
-            const address = await signer.getAddress();
             setHasChannel(true);
-            await addParticipantToDatabase(address);
+            await addParticipantToDatabase(address as string);
             await loadParticipants();
           } else {
             setHasChannel(false);
@@ -210,24 +197,18 @@ export const useNitrolite = () => {
       setConnectionStatus("disconnected");
       setIsAuthenticated(false);
     };
-  }, [ws, messageSigner, userAddress, participants]);
+  }, [ws, messageSigner, address, participants]);
 
   const authenticateUser = useCallback(async () => {
     console.log("Starting authentication process");
 
-    if (!window.ethereum) {
-      console.error("No Ethereum provider found");
-      setError("No Ethereum provider found");
+    if (!address) {
+      setError("No wallet connected");
       return;
     }
 
     try {
       console.log("Initializing provider and requesting accounts");
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      setAddress(address);
       console.log("Connected wallet address:", address);
 
       console.log("Creating signing wallet");
@@ -235,7 +216,6 @@ export const useNitrolite = () => {
       const wallet = new ethers.Wallet(ethers.hexlify(privateKey));
       console.log("Generated wallet address:", wallet.address);
       walletRef.current = wallet;
-      setUserAddress(address);
 
       if (!ws) {
         console.error("WebSocket not connected");
@@ -436,6 +416,7 @@ export const useNitrolite = () => {
     usdBalance,
     setUsdBalance,
     setHasChannel,
+    setIsAuthenticated,
     connectToWebSocket,
     authenticateUser,
     createAppSession,

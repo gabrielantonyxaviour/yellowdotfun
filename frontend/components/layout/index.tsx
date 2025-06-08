@@ -5,9 +5,11 @@ import { SplashScreen } from "../splash";
 import { useAccount } from "wagmi";
 import { useNitrolite } from "@/hooks/use-nitrolite";
 import { Address } from "viem";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { address } = useAccount();
+  const { logout } = usePrivy();
   const {
     connectionStatus,
     connectToWebSocket,
@@ -15,6 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     hasChannel,
     isAuthenticated,
     usdBalance,
+    setIsAuthenticated,
   } = useNitrolite();
 
   return address && hasChannel ? (
@@ -29,6 +32,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ) : (
     <SplashScreen
       isAuthenticated={isAuthenticated}
+      logout={() => {
+        setIsAuthenticated(false);
+        logout();
+      }}
       hasChannel={hasChannel}
       authenticateUser={authenticateUser}
       connectionStatus={connectionStatus}

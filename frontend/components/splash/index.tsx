@@ -2,16 +2,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { useAccount, useConnect } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount } from "wagmi";
 import { Badge } from "../ui/badge";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import { useConnectWallet, usePrivy } from "@privy-io/react-auth";
 
 export function SplashScreen({
   isAuthenticated,
+  logout,
   hasChannel,
   authenticateUser,
   connectionStatus,
@@ -19,6 +19,7 @@ export function SplashScreen({
 }: {
   isAuthenticated: boolean;
   hasChannel: boolean | null;
+  logout: () => void;
   authenticateUser: () => void;
   connectionStatus: string;
   connectToWebSocket: () => void;
@@ -75,22 +76,24 @@ export function SplashScreen({
         </p>
       </div>
 
-      <Badge
-        className={`${
-          connectionStatus === "connected"
-            ? "bg-green-500 hover:bg-green-600 cursor-default"
-            : connectionStatus === "connecting"
-            ? "bg-yellow-500 hover:bg-yellow-600 cursor-default"
-            : "bg-red-500 hover:bg-red-600 cursor-pointer"
-        }  cursor-pointer mb-3`}
-        onClick={() => {
-          if (connectionStatus === "disconnected") {
-            connectToWebSocket();
-          }
-        }}
-      >
-        {connectionStatus}
-      </Badge>
+      {address && (
+        <Badge
+          className={`${
+            connectionStatus === "connected"
+              ? "bg-green-500 hover:bg-green-600 cursor-default"
+              : connectionStatus === "connecting"
+              ? "bg-yellow-500 hover:bg-yellow-600 cursor-default"
+              : "bg-red-500 hover:bg-red-600 cursor-pointer"
+          }  cursor-pointer mb-3`}
+          onClick={() => {
+            if (connectionStatus === "disconnected") {
+              connectToWebSocket();
+            }
+          }}
+        >
+          {connectionStatus}
+        </Badge>
+      )}
       {!address ? (
         <Button
           onClick={handleLogin}
@@ -105,20 +108,30 @@ export function SplashScreen({
         </Button>
       ) : (
         !isAuthenticated && (
-          <Button
-            onClick={handleAuthenticateChannel}
-            disabled={loading}
-            className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
-          >
-            <Image
-              src="/yellow.jpg"
-              alt="Yellow"
-              width={20}
-              height={20}
-              className="rounded-full"
-            />
-            <p className="text-sm font-semibold">Authenticate your Channel</p>
-          </Button>
+          <div className="flex items-center justify-center w-full space-x-6">
+            <Button
+              onClick={handleAuthenticateChannel}
+              disabled={loading}
+              className="w-full flex flex-1 space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
+            >
+              <Image
+                src="/yellow.jpg"
+                alt="Yellow"
+                width={20}
+                height={20}
+                className="rounded-full"
+              />
+              <p className="text-sm font-semibold">Authenticate your Channel</p>
+            </Button>
+            <button
+              className="p-1 hover:bg-black/10 rounded hover:bg-transparent"
+              onClick={() => {
+                logout();
+              }}
+            >
+              <LogOut className="w-6 h-6 text-black" />
+            </button>
+          </div>
         )
       )}
     </div>
