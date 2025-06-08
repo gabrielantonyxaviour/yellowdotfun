@@ -3,9 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
-import { useAccount, useDisconnect } from "wagmi";
-import { useState } from "react";
 import WalletSheet from "./wallet-sheet";
+import { usePrivy } from "@privy-io/react-auth";
 
 export function AppHeader({
   usdBalance,
@@ -16,11 +15,10 @@ export function AppHeader({
   connectionStatus: string;
   connectToWebSocket: () => void;
 }) {
-  const { address } = useAccount();
-  const { disconnectAsync } = useDisconnect();
-  const handleLogout = async () => {
+  const { logout } = usePrivy();
+  const handleLogout = () => {
     try {
-      await disconnectAsync();
+      logout();
     } catch (error) {
       console.error("Logout error:", error);
     }

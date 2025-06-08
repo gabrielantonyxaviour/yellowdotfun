@@ -1,6 +1,6 @@
 import { createConfig } from "@privy-io/wagmi";
 import { http } from "viem";
-import { flowMainnet, worldchain } from "viem/chains";
+import { flowMainnet } from "viem/chains";
 
 export const config = createConfig({
   chains: [flowMainnet],
