@@ -1,12 +1,29 @@
 "use client";
 
 import { TokenCard } from "@/components/tokens/token-card";
-import { useRecentTokens } from "@/hooks/use-tokens";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getRecentTokens } from "@/lib/api";
 
 export function RecentLaunches() {
-  const { tokens, isLoading } = useRecentTokens();
+  const [tokens, setTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRecentTokens() {
+      try {
+        const data = await getRecentTokens();
+        setTokens(data);
+      } catch (error) {
+        console.error("Failed to fetch recent tokens:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchRecentTokens();
+  }, []);
 
   return (
     <section className="py-16 px-4 bg-stone-900">

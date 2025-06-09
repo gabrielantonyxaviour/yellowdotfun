@@ -3,13 +3,14 @@
 
 import { TokenCard } from "@/components/tokens/token-card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTokenStats } from "@/hooks/use-token-stats";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAllTokens } from "@/lib/api";
 
 export function TokensGrid() {
-  const { tokens, isLoading } = useTokenStats();
+  const [tokens, setTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [visibleTokens, setVisibleTokens] = useState(6);
   const [activeFilter, setActiveFilter] = useState("all");
 
@@ -21,20 +22,24 @@ export function TokensGrid() {
     { id: "losers", label: "Losers", emoji: "📉" },
   ];
 
-  const filteredTokens = tokens.filter((token) => {
-    switch (activeFilter) {
-      case "trending":
-        return token.buy_count > 5; // Tokens with more than 5 buys
-      case "new":
-        return token.buy_count + token.sell_count < 5; // New tokens with few transactions
-      case "gainers":
-        return token.price_change_24h > 0;
-      case "losers":
-        return token.price_change_24h < 0;
-      default:
-        return true;
+  useEffect(() => {
+    async function fetchTokens() {
+      try {
+        setIsLoading(true);
+        const data = await getAllTokens({
+          filter: activeFilter,
+          limit: 50,
+        });
+        setTokens(data);
+      } catch (error) {
+        console.error("Failed to fetch tokens:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  });
+
+    fetchTokens();
+  }, [activeFilter]);
 
   const loadMore = () => {
     setVisibleTokens((prev) => prev + 6);
@@ -64,7 +69,6 @@ export function TokensGrid() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Pills */}
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex gap-2 pb-2">
           {filters.map((filter) => (
@@ -89,21 +93,19 @@ export function TokensGrid() {
         </div>
       </ScrollArea>
 
-      {/* Tokens Grid */}
       <div className="grid grid-cols-1 gap-3">
-        {filteredTokens.length === 0 ? (
+        {tokens.length === 0 ? (
           <div className="text-center py-8 text-stone-400">
             No tokens found for this filter
           </div>
         ) : (
-          filteredTokens
+          tokens
             .slice(0, visibleTokens)
             .map((token) => <TokenCard key={token.id} token={token} />)
         )}
       </div>
 
-      {/* Load More */}
-      {visibleTokens < filteredTokens.length && (
+      {visibleTokens < tokens.length && (
         <div className="pt-4">
           <Button
             onClick={loadMore}

@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function GET(request: NextRequest) {
@@ -13,11 +13,10 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get("offset") || "0");
     const sortBy = searchParams.get("sortBy") || "created_at";
     const order = searchParams.get("order") || "desc";
+    const filter = searchParams.get("filter") || "all";
 
-    const { data, error } = await supabase
-      .from("tokens")
-      .select(
-        `
+    let query = supabase.from("tokens").select(
+      `
         *,
         token_market_data (
           current_supply,
@@ -27,13 +26,95 @@ export async function GET(request: NextRequest) {
           graduated_to_dex
         )
       `
-      )
+    );
+
+    // Apply filters
+    if (filter === "trending") {
+      query = query.gte("token_market_data.volume_24h", 1000);
+    } else if (filter === "new") {
+      query = query.gte(
+        "created_at",
+        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+      );
+    }
+
+    const { data, error } = await query
       .order(sortBy, { ascending: order === "asc" })
       .range(offset, offset + limit - 1);
 
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      token_name,
+      token_symbol,
+      token_image,
+      creator_allocation,
+      liquidity_amount,
+      twitter,
+      telegram,
+      website,
+      creator_address,
+    } = body;
+
+    // Create token
+    const { data: token, error: tokenError } = await supabase
+      .from("tokens")
+      .insert({
+        token_name,
+        token_symbol,
+        token_image,
+        creator_allocation,
+        liquidity_amount,
+        twitter,
+        telegram,
+        website,
+      })
+      .select()
+      .single();
+
+    if (tokenError) throw tokenError;
+
+    // Initialize market data
+    const creatorTokens = (creator_allocation / 100) * 1000000000;
+    const initialSupply = creatorTokens;
+    const availableTokens = 1073000000 - initialSupply;
+    const initialPrice = (30000 + liquidity_amount) / availableTokens;
+
+    const { error: marketError } = await supabase
+      .from("token_market_data")
+      .insert({
+        token_id: token.id,
+        current_supply: initialSupply,
+        current_price_usd: initialPrice,
+        market_cap_usd: initialSupply * initialPrice,
+        volume_24h: 0,
+      });
+
+    if (marketError) throw marketError;
+
+    // Give creator their allocation
+    if (creator_allocation > 0 && creator_address) {
+      const { error: balanceError } = await supabase
+        .from("user_token_balances")
+        .insert({
+          user_address: creator_address,
+          token_id: token.id,
+          balance: creatorTokens,
+        });
+
+      if (balanceError) throw balanceError;
+    }
+
+    return NextResponse.json({ success: true, token });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }

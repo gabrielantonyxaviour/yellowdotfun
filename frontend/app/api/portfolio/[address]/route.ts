@@ -33,11 +33,10 @@ export async function GET(
 
     if (error) throw error;
 
-    // Calculate portfolio value
     const portfolio = data.map((item: any) => ({
       ...item,
       value_usd:
-        item.balance * (item.token_market_data?.[0]?.current_price_usd || 0),
+        item.balance * (item.token_market_data?.current_price_usd || 0),
     }));
 
     const totalValue = portfolio.reduce((sum, item) => sum + item.value_usd, 0);

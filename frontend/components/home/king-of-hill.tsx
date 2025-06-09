@@ -12,11 +12,28 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { formatNumber, formatPercentage } from "@/lib/utils";
-import { useTokenStats } from "@/hooks/use-token-stats";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useEffect } from "react";
+import { getKingToken } from "@/lib/api";
 
 export function KingOfHill() {
-  const { kingToken, isLoading } = useTokenStats();
+  const [kingToken, setKingToken] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchKingToken() {
+      try {
+        const data = await getKingToken();
+        setKingToken(data);
+      } catch (error) {
+        console.error("Failed to fetch king token:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchKingToken();
+  }, []);
 
   if (isLoading) {
     return (

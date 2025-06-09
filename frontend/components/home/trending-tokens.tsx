@@ -1,12 +1,29 @@
 "use client";
 
 import { TokenCard } from "@/components/tokens/token-card";
-import { useTrendingTokens } from "@/hooks/use-tokens";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getTrendingTokens } from "@/lib/api";
 
 export function TrendingTokens() {
-  const { tokens, isLoading } = useTrendingTokens();
+  const [tokens, setTokens] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTrendingTokens() {
+      try {
+        const data = await getTrendingTokens();
+        setTokens(data);
+      } catch (error) {
+        console.error("Failed to fetch trending tokens:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTrendingTokens();
+  }, []);
 
   return (
     <section className="py-16 px-4 bg-stone-800">

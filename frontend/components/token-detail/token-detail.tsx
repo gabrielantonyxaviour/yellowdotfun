@@ -1,4 +1,3 @@
-// Updated TokenDetail component to properly initialize the token
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,14 +14,38 @@ import { formatNumber, formatPercentage } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useTradingStore } from "@/lib/trading-store";
 import { tradingSimulator } from "@/lib/trading-simulator";
+import { getTokenById, getTokenTransactions } from "@/lib/api";
 
 interface TokenDetailProps {
   tokenId: string;
 }
 
 export function TokenDetail({ tokenId }: TokenDetailProps) {
-  const [activeTab, setActiveTab] = useState("holders");
-  const { token, transactions, isLoading, error } = useTokenData(tokenId);
+  const [token, setToken] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchTokenData() {
+      try {
+        setIsLoading(true);
+        const [tokenData, transactionData] = await Promise.all([
+          getTokenById(tokenId),
+          getTokenTransactions(tokenId),
+        ]);
+
+        setToken(tokenData);
+        setTransactions(transactionData);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTokenData();
+  }, [tokenId]);
 
   if (isLoading) {
     return (
@@ -37,6 +60,7 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
       </div>
     );
   }
+
   return (
     <div className="space-y-6">
       {/* Token Header */}
@@ -122,7 +146,7 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
               id: token.id,
               name: token.token_name,
               symbol: token.token_symbol,
-              price: 0,
+              price: token.token_market_data?.current_price_usd || 0,
             }}
           />
         </div>

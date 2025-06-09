@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { useTradingStore } from "@/lib/trading-store";
 import { formatNumber } from "@/lib/utils";
-import { Wallet } from "lucide-react";
+import { buyToken, sellToken, getTokenPrice } from "@/lib/api";
 
 interface TradingPanelProps {
   token: {
@@ -28,48 +27,67 @@ export function TradingPanel({ token }: TradingPanelProps) {
   const [buyAmount, setBuyAmount] = useState("");
   const [sellAmount, setSellAmount] = useState("");
   const [slippage, setSlippage] = useState([1]);
+  const [currentPrice, setCurrentPrice] = useState(token.price);
+  const [userTokenBalance, setUserTokenBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    buyToken,
-    sellToken,
-    getTokenPrice,
-    setUserBalance,
-    tokens,
-    userBalances,
-  } = useTradingStore();
-
-  const currentToken = tokens[token.id];
-  const currentPrice = getTokenPrice(token.id);
-  const userEthBalance = userBalances[userAddress] || 0;
-  const userTokenBalance = currentToken?.holders[userAddress] || 0;
-
-  // Initialize user with some ETH
   useEffect(() => {
-    if (userEthBalance === 0) {
-      setUserBalance(userAddress, 1); // Give user 1 ETH to start
-    }
-  }, [userAddress, userEthBalance, setUserBalance]);
+    // Initialize with mock data for demo
+    setCurrentPrice(token.price || 0.001);
+  }, [token.price]);
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     const amount = parseFloat(buyAmount);
     if (amount > 0) {
-      const success = buyToken(token.id, userAddress, amount);
-      if (success) {
+      try {
+        setIsLoading(true);
+        const result = await buyToken({
+          token_id: token.id,
+          user_address: userAddress,
+          usd_amount: amount,
+        });
+
         setBuyAmount("");
-      } else {
-        alert("Insufficient ETH balance or invalid amount");
+        setUserTokenBalance((prev) => prev + result.tokenAmount);
+        setCurrentPrice(result.finalPrice);
+
+        alert(
+          `Successfully bought ${formatNumber(result.tokenAmount)} ${
+            token.symbol
+          }`
+        );
+      } catch (error: any) {
+        alert("Transaction failed: " + error.message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  const handleSell = () => {
+  const handleSell = async () => {
     const amount = parseFloat(sellAmount);
     if (amount > 0) {
-      const success = sellToken(token.id, userAddress, amount);
-      if (success) {
+      try {
+        setIsLoading(true);
+        const result = await sellToken({
+          token_id: token.id,
+          user_address: userAddress,
+          token_amount: amount,
+        });
+
         setSellAmount("");
-      } else {
-        alert("Insufficient token balance or invalid amount");
+        setUserTokenBalance((prev) => prev - amount);
+        setCurrentPrice(result.finalPrice);
+
+        alert(
+          `Successfully sold ${amount} ${token.symbol} for $${formatNumber(
+            result.usdAmount
+          )}`
+        );
+      } catch (error: any) {
+        alert("Transaction failed: " + error.message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -79,6 +97,7 @@ export function TradingPanel({ token }: TradingPanelProps) {
       <h2 className="text-2xl font-black text-white cartoon-text mb-4">
         Trade ${token.symbol}
       </h2>
+
       <div className="mb-4 p-4 bg-stone-900 rounded-lg space-y-2">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-gray-400">Your Balance</p>
@@ -107,14 +126,14 @@ export function TradingPanel({ token }: TradingPanelProps) {
         </div>
         <div className="flex items-baseline gap-2">
           <p className="text-2xl font-black text-white">
-            {formatNumber(currentPrice)}
+            ${formatNumber(currentPrice)}
           </p>
           <p className="text-sm text-gray-400">USD</p>
         </div>
       </div>
 
       <Tabs defaultValue="buy" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-stone-900 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:via-yellow-600 data-[state=active]:to-yellow-400">
+        <TabsList className="grid w-full grid-cols-2 bg-stone-900 rounded-lg">
           <TabsTrigger value="buy" className="font-semibold">
             Buy
           </TabsTrigger>
@@ -134,8 +153,7 @@ export function TradingPanel({ token }: TradingPanelProps) {
               placeholder="0.00"
               value={buyAmount}
               onChange={(e) => setBuyAmount(e.target.value)}
-              className=" font-medium text-lg bg-stone-900 border-none text-white"
-              max={userEthBalance}
+              className="font-medium text-lg bg-stone-900 border-none text-white"
               step="0.001"
             />
           </div>
@@ -144,8 +162,8 @@ export function TradingPanel({ token }: TradingPanelProps) {
             <Label className="font-bold text-white">
               You'll receive (approx)
             </Label>
-            <div className="cartoon-border bg-stone-900 p-3 rounded-lg">
-              <p className="text-lg font-medium text-yellow-400 ">
+            <div className="bg-stone-900 p-3 rounded-lg">
+              <p className="text-lg font-medium text-yellow-400">
                 {buyAmount && currentPrice > 0
                   ? formatNumber(parseFloat(buyAmount) / currentPrice)
                   : "0"}{" "}
@@ -156,10 +174,10 @@ export function TradingPanel({ token }: TradingPanelProps) {
 
           <Button
             onClick={handleBuy}
-            disabled={!buyAmount || parseFloat(buyAmount) > userEthBalance}
-            className="w-full cartoon-border cartoon-shadow bg-green-500 hover:bg-green-400 text-white font-bold text-lg py-6"
+            disabled={!buyAmount || isLoading}
+            className="w-full bg-green-500 hover:bg-green-400 text-white font-bold text-lg py-6"
           >
-            Buy {token.symbol}
+            {isLoading ? "Processing..." : `Buy ${token.symbol}`}
           </Button>
         </TabsContent>
 
@@ -189,20 +207,24 @@ export function TradingPanel({ token }: TradingPanelProps) {
             </Label>
             <div className="text-white bg-stone-900 p-3 rounded-lg">
               <p className="text-lg font-bold">
+                $
                 {sellAmount && currentPrice > 0
                   ? formatNumber(parseFloat(sellAmount) * currentPrice)
-                  : "0"}{" "}
-                ETH
+                  : "0"}
               </p>
             </div>
           </div>
 
           <Button
             onClick={handleSell}
-            disabled={!sellAmount || parseFloat(sellAmount) > userTokenBalance}
-            className="w-full cartoon-border cartoon-shadow bg-red-500 hover:bg-red-400 text-white font-bold text-lg py-6"
+            disabled={
+              !sellAmount ||
+              parseFloat(sellAmount) > userTokenBalance ||
+              isLoading
+            }
+            className="w-full bg-red-500 hover:bg-red-400 text-white font-bold text-lg py-6"
           >
-            Sell {token.symbol}
+            {isLoading ? "Processing..." : `Sell ${token.symbol}`}
           </Button>
         </TabsContent>
       </Tabs>
@@ -217,7 +239,7 @@ export function TradingPanel({ token }: TradingPanelProps) {
           onValueChange={setSlippage}
           max={10}
           step={0.5}
-          className="cartoon-border"
+          className="w-full"
         />
       </div>
     </Card>
