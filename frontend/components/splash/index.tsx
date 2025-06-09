@@ -35,7 +35,7 @@ export function SplashScreen({
 }) {
   const [loading, setLoading] = useState(false);
   const [depositAmount, setDepositAmount] = useState<string>("0");
-  const { authenticated, login } = usePrivy();
+  const { authenticated, login, ready } = usePrivy();
   const { address } = useAccount();
   const { balance: usdBalance } = useTokenBalance(address);
 
@@ -126,11 +126,19 @@ export function SplashScreen({
       {!authenticated ? (
         <Button
           onClick={handleLogin}
-          disabled={loading}
+          disabled={loading || !ready}
           className="w-full flex space-x-2 max-w-sm bg-black text-yellow-400 hover:bg-black/90 py-6 rounded-2xl font-bold text-lg border-2 border-black shadow-lg"
         >
           {loading ? (
-            <Loader2 className="animate-spin" />
+            <>
+              <Loader2 className="animate-spin" />
+              <p className="text-sm font-semibold">Connecting</p>
+            </>
+          ) : !ready ? (
+            <>
+              <Loader2 className="animate-spin" />
+              <p className="text-sm font-semibold">Setting up</p>
+            </>
           ) : (
             <p className="text-sm font-semibold">Connect Wallet</p>
           )}

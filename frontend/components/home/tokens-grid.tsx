@@ -3,17 +3,24 @@
 
 import { TokenCard } from "@/components/tokens/token-card";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAllTokens } from "@/lib/api";
 
-export function TokensGrid() {
-  const [tokens, setTokens] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [visibleTokens, setVisibleTokens] = useState(6);
-  const [activeFilter, setActiveFilter] = useState("all");
-
+export function TokensGrid({
+  tokens,
+  isLoading,
+  activeFilter,
+  setActiveFilter,
+  visibleTokens,
+  loadMore,
+}: {
+  tokens: any[];
+  isLoading: boolean;
+  activeFilter: string;
+  setActiveFilter: (filter: string) => void;
+  visibleTokens: number;
+  loadMore: () => void;
+}) {
   const filters = [
     { id: "all", label: "All", emoji: "🔥" },
     { id: "trending", label: "Trending", emoji: "📈" },
@@ -21,29 +28,6 @@ export function TokensGrid() {
     { id: "gainers", label: "Gainers", emoji: "🚀" },
     { id: "losers", label: "Losers", emoji: "📉" },
   ];
-
-  useEffect(() => {
-    async function fetchTokens() {
-      try {
-        setIsLoading(true);
-        const data = await getAllTokens({
-          filter: activeFilter,
-          limit: 50,
-        });
-        setTokens(data);
-      } catch (error) {
-        console.error("Failed to fetch tokens:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchTokens();
-  }, [activeFilter]);
-
-  const loadMore = () => {
-    setVisibleTokens((prev) => prev + 6);
-  };
 
   if (isLoading) {
     return (
@@ -95,7 +79,7 @@ export function TokensGrid() {
 
       <div className="grid grid-cols-1 gap-3">
         {tokens.length === 0 ? (
-          <div className="text-center py-8 text-stone-400">
+          <div className="text-center text-sm py-8 text-stone-400">
             No tokens found for this filter
           </div>
         ) : (

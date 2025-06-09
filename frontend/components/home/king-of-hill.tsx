@@ -16,25 +16,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { getKingToken } from "@/lib/api";
 
-export function KingOfHill() {
-  const [kingToken, setKingToken] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchKingToken() {
-      try {
-        const data = await getKingToken();
-        setKingToken(data);
-      } catch (error) {
-        console.error("Failed to fetch king token:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchKingToken();
-  }, []);
-
+export function KingOfHill({
+  kingToken,
+  isLoading,
+}: {
+  kingToken: any;
+  isLoading: boolean;
+}) {
   if (isLoading) {
     return (
       <div className="mb-6">
@@ -55,7 +43,9 @@ export function KingOfHill() {
           <h2 className="text-lg font-semibold text-white">King of the Hill</h2>
         </div>
         <div className="bg-stone-800 rounded-2xl p-4 border-2 border-stone-600">
-          <p className="text-center text-stone-400">No tokens available yet</p>
+          <p className="text-center text-sm text-stone-400">
+            No tokens available yet
+          </p>
         </div>
       </div>
     );

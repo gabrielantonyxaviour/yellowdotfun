@@ -3,17 +3,26 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, RefreshCcw } from "lucide-react";
 import { useState } from "react";
 import { CreateCoinSheet } from "@/components/create/create-coin-sheet";
 
-export function HomeHero() {
+export function HomeHero({ fetchTokens }: { fetchTokens: () => void }) {
   return (
     <>
       <div className="py-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between space-x-2">
           <h1 className="text-2xl font-black text-white">Coins</h1>
-
+          <div className="flex items-center flex-1 justify-end space-x-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-transparent text-yellow-400 hover:text-yellow-400"
+              onClick={() => fetchTokens()}
+            >
+              <RefreshCcw className="h-5 w-5" />
+            </Button>
+          </div>
           <CreateCoinSheet />
         </div>
 
