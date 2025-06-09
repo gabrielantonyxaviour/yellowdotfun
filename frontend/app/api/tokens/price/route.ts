@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
 const VIRTUAL_USD_RESERVES = 30000;
 const VIRTUAL_TOKEN_RESERVES = 1073000000;
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!
+    );
+
     const { token_id, usd_amount, token_amount, action } = await request.json();
 
     const { data: marketData, error: marketError } = await supabase

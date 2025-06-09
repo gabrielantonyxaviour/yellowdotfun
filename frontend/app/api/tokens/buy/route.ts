@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 const VIRTUAL_USD_RESERVES = 30000;
 const VIRTUAL_TOKEN_RESERVES = 1073000000;
 const PLATFORM_FEE_BPS = 100;
@@ -32,6 +28,11 @@ function calculateBuyTokenAmount(
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const { token_id, user_address, usd_amount } = await request.json();
 
     // Get current market data and liquidity amount

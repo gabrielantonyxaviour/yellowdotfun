@@ -29,6 +29,7 @@ import { useNitrolite } from "@/hooks/use-nitrolite";
 import { ethers } from "ethers";
 import { Address } from "viem";
 import { useRouter } from "next/navigation";
+import { createToken } from "@/lib/api";
 
 interface FormData {
   name: string;
@@ -145,43 +146,32 @@ export function CreateCoinSheet() {
       website?: string;
     }
 
-    console.log("Preparing token data...");
-    const tokenData: CreateTokenRequest = {
-      token_name: formData.name,
-      token_symbol: formData.symbol,
-      token_image: imageUrl,
-      creator_allocation: formData.creatorPercentage[0],
-      liquidity_amount: parseFloat(formData.liquidityAmount),
-      twitter: formData.twitter,
-      telegram: formData.telegram,
-      website: formData.website,
-    };
-    console.log("Token data prepared:", tokenData);
+    try {
+      console.log("Preparing token data...");
+      const tokenData = {
+        token_name: formData.name,
+        token_symbol: formData.symbol,
+        token_image: imageUrl,
+        creator_allocation: formData.creatorPercentage[0],
+        liquidity_amount: parseFloat(formData.liquidityAmount),
+        twitter: formData.twitter,
+        telegram: formData.telegram,
+        website: formData.website,
+        creator_address: address,
+      };
 
-    console.log("Sending token creation request...");
-    const tokenRequest = await fetch("/api/tokens", {
-      method: "POST",
-      body: JSON.stringify(tokenData),
-    });
-    const tokenResponse = await tokenRequest.json();
+      console.log("Creating token...");
+      const token = await createToken(tokenData);
 
-    if (tokenResponse.error) {
-      console.error("Token creation failed:", tokenResponse.error);
-      console.error("Full error response:", tokenResponse);
-    } else {
-      console.log("Token created successfully:", tokenResponse);
-      console.log("Token details:", {
-        name: tokenData.token_name,
-        symbol: tokenData.token_symbol,
-        creatorAllocation: tokenData.creator_allocation,
-        liquidityAmount: tokenData.liquidity_amount,
-      });
-      setTokenId(tokenResponse.id);
+      console.log("Token created successfully:", token);
+      setTokenId(token.id);
+      setStep(5);
+    } catch (error: any) {
+      console.error("Token creation failed:", error);
+      alert("Failed to create token: " + error.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    console.log("Moving to success step...");
-    setStep(5);
-    setIsLoading(false);
   };
 
   const isStep1Valid = formData.name && formData.symbol && formData.image;
