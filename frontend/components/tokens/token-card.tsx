@@ -56,7 +56,9 @@ export function TokenCard({ token }: TokenCardProps) {
           <div className="flex justify-between items-center">
             <span className="text-xs text-stone-400">Price</span>
             <div className="flex items-center gap-1">
-              <span className="font-bold text-white">${price}</span>
+              <span className="font-bold text-white">
+                ${formatNumber(price)}
+              </span>
               {/* <span
                 className={`text-xs flex items-center gap-1 ${
                   isPositive ? "text-green-400" : "text-red-400"

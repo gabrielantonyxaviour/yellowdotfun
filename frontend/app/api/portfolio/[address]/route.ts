@@ -3,9 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   try {
+    const { address } = await params;
     const supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!
@@ -28,7 +29,7 @@ export async function GET(
         )
       `
       )
-      .eq("user_address", params.address)
+      .eq("user_address", address)
       .gt("balance", 0);
 
     if (error) throw error;

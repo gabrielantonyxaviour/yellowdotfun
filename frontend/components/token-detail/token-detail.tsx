@@ -132,12 +132,12 @@ export function TokenDetail({ tokenId }: TokenDetailProps) {
           </Card> */}
 
           {/* Comments Section */}
-          <Card className="bg-stone-800 rounded-lg shadow-lg border-none p-6">
+          {/* <Card className="bg-stone-800 rounded-lg shadow-lg border-none p-6">
             <h2 className="text-xl font-black text-white mb-4">Comments</h2>
             <div className="text-center py-8 text-gray-500">
               Comments coming soon...
             </div>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="space-y-6">

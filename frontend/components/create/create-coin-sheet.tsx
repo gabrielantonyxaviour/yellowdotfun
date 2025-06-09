@@ -29,7 +29,9 @@ import { useNitrolite } from "@/hooks/use-nitrolite";
 import { ethers } from "ethers";
 import { Address } from "viem";
 import { useRouter } from "next/navigation";
-import { createToken } from "@/lib/api";
+import { createToken, updateTokenImage } from "@/lib/api";
+import { useAccount } from "wagmi";
+import { toast } from "sonner";
 
 interface FormData {
   name: string;
@@ -47,6 +49,7 @@ export function CreateCoinSheet() {
   const [step, setStep] = useState(1);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { address } = useAccount();
   const { participants, createAppSession, closeAppSession } = useNitrolite();
   const [tokenId, setTokenId] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
@@ -78,17 +81,10 @@ export function CreateCoinSheet() {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (address: Address) => {
     setIsLoading(true);
     console.log("Starting token creation process...");
     console.log("Form data:", formData);
-
-    console.log("Initializing Ethereum provider...");
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
-    console.log("Connected wallet address:", address);
 
     console.log("Preparing pre-allocation changes...");
     const preAllocationChanges = [
@@ -122,29 +118,6 @@ export function CreateCoinSheet() {
     console.log("App session closed successfully");
 
     let imageUrl = "";
-    // if (formData.image) {
-    //   const uploadFormData = new FormData();
-    //   uploadFormData.append("file", formData.image);
-    //   console.log("Uploading image to Pinata...");
-    //   const imageRequst = await fetch("/api/supabase/image", {
-    //     method: "POST",
-    //     body: uploadFormData,
-    //   });
-    //   const imageResponse = await imageRequst.json();
-    //   imageUrl = imageResponse.url;
-    //   console.log("Image uploaded successfully:", imageUrl);
-    // }
-
-    interface CreateTokenRequest {
-      token_name: string;
-      token_symbol: string;
-      token_image?: string;
-      creator_allocation?: number;
-      liquidity_amount: number;
-      twitter?: string;
-      telegram?: string;
-      website?: string;
-    }
 
     try {
       console.log("Preparing token data...");
@@ -152,8 +125,8 @@ export function CreateCoinSheet() {
         token_name: formData.name,
         token_symbol: formData.symbol,
         token_image: imageUrl,
-        creator_allocation: formData.creatorPercentage[0],
-        liquidity_amount: parseFloat(formData.liquidityAmount),
+        creator_allocation: formData.creatorPercentage[0].toString(),
+        liquidity_amount: formData.liquidityAmount,
         twitter: formData.twitter,
         telegram: formData.telegram,
         website: formData.website,
@@ -166,9 +139,21 @@ export function CreateCoinSheet() {
       console.log("Token created successfully:", token);
       setTokenId(token.id);
       setStep(5);
+      if (formData.image) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", formData.image);
+        console.log("Uploading image to Pinata...");
+        const imageRequst = await fetch("/api/supabase/upload", {
+          method: "POST",
+          body: uploadFormData,
+        });
+        const imageResponse = await imageRequst.json();
+        const updateImage = await updateTokenImage(token.id, imageResponse.url);
+        console.log("Image uploaded successfully:", imageUrl);
+      }
     } catch (error: any) {
       console.error("Token creation failed:", error);
-      alert("Failed to create token: " + error.message);
+      toast.error("Failed to create token: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -543,7 +528,7 @@ export function CreateCoinSheet() {
                   Back
                 </Button>
                 <Button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit(address as Address)}
                   className="flex-1 yellow-button py-4 font-bold rounded-xl"
                   disabled={!isStep4Valid || isLoading}
                 >

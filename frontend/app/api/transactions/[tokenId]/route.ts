@@ -3,9 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { tokenId: string } }
+  { params }: { params: Promise<{ tokenId: string }> }
 ) {
   try {
+    const { tokenId } = await params;
     const supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!
@@ -17,7 +18,7 @@ export async function GET(
     const { data, error } = await supabase
       .from("token_transactions")
       .select("*")
-      .eq("token_id", params.tokenId)
+      .eq("token_id", tokenId)
       .order("created_at", { ascending: false })
       .limit(limit);
 

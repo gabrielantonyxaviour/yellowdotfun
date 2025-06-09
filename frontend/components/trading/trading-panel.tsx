@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { formatNumber } from "@/lib/utils";
 import { buyToken, sellToken, getTokenPrice } from "@/lib/api";
+import { useNitrolite } from "@/hooks/use-nitrolite";
+import { toast } from "sonner";
 
 interface TradingPanelProps {
   token: {
@@ -30,6 +32,7 @@ export function TradingPanel({ token }: TradingPanelProps) {
   const [currentPrice, setCurrentPrice] = useState(token.price);
   const [userTokenBalance, setUserTokenBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const { usdBalance } = useNitrolite();
 
   useEffect(() => {
     // Initialize with mock data for demo
@@ -51,13 +54,13 @@ export function TradingPanel({ token }: TradingPanelProps) {
         setUserTokenBalance((prev) => prev + result.tokenAmount);
         setCurrentPrice(result.finalPrice);
 
-        alert(
+        toast.success(
           `Successfully bought ${formatNumber(result.tokenAmount)} ${
             token.symbol
           }`
         );
       } catch (error: any) {
-        alert("Transaction failed: " + error.message);
+        toast.error("Transaction failed: " + error.message);
       } finally {
         setIsLoading(false);
       }
@@ -79,13 +82,13 @@ export function TradingPanel({ token }: TradingPanelProps) {
         setUserTokenBalance((prev) => prev - amount);
         setCurrentPrice(result.finalPrice);
 
-        alert(
-          `Successfully sold ${amount} ${token.symbol} for $${formatNumber(
-            result.usdAmount
-          )}`
+        toast.success(
+          `Successfully sold ${formatNumber(result.tokenAmount)} ${
+            token.symbol
+          }`
         );
       } catch (error: any) {
-        alert("Transaction failed: " + error.message);
+        toast.error("Transaction failed: " + error.message);
       } finally {
         setIsLoading(false);
       }
@@ -144,9 +147,17 @@ export function TradingPanel({ token }: TradingPanelProps) {
 
         <TabsContent value="buy" className="space-y-4">
           <div>
-            <Label htmlFor="buy-amount" className="font-bold text-white">
-              Amount (USD)
-            </Label>
+            <div className="flex items-center justify-between py-2">
+              <Label htmlFor="buy-amount" className="font-bold text-white">
+                Amount (USD)
+              </Label>
+              <p
+                className="text-sm text-yellow-400"
+                onClick={() => setBuyAmount(usdBalance.toString())}
+              >
+                Max
+              </p>
+            </div>
             <Input
               id="buy-amount"
               type="number"
@@ -183,6 +194,17 @@ export function TradingPanel({ token }: TradingPanelProps) {
 
         <TabsContent value="sell" className="space-y-4">
           <div>
+            <div className="flex items-center justify-between py-2">
+              <Label htmlFor="sell-amount" className="font-semibold text-white">
+                Amount ({token.symbol})
+              </Label>
+              <p
+                className="text-sm text-yellow-400"
+                onClick={() => setSellAmount(userTokenBalance.toString())}
+              >
+                Max
+              </p>
+            </div>
             <Label
               htmlFor="sell-amount"
               className="font-semibold text-white pb-1"

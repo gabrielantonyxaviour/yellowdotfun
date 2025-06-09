@@ -56,8 +56,8 @@ export async function createToken(tokenData: {
   token_name: string;
   token_symbol: string;
   token_image?: string;
-  creator_allocation?: number;
-  liquidity_amount: number;
+  creator_allocation?: string;
+  liquidity_amount: string;
   twitter?: string;
   telegram?: string;
   website?: string;
@@ -140,4 +140,12 @@ export async function getUserPortfolio(address: string) {
 
   if (!result.success) throw new Error(result.error);
   return result;
+}
+
+export async function updateTokenImage(tokenId: string, imageUrl: string) {
+  const response = await fetch(`/api/tokens/${tokenId}/image`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image_url: imageUrl }),
+  });
 }
