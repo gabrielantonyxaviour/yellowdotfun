@@ -8,26 +8,18 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { tokenId: string } }
 ) {
   try {
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "50");
+
     const { data, error } = await supabase
-      .from("tokens")
-      .select(
-        `
-        *,
-        token_market_data (
-          current_supply,
-          current_price_usd,
-          market_cap_usd,
-          volume_24h,
-          graduated_to_dex,
-          graduation_market_cap
-        )
-      `
-      )
-      .eq("id", params.id)
-      .single();
+      .from("token_transactions")
+      .select("*")
+      .eq("token_id", params.tokenId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
     if (error) throw error;
 

@@ -2,7 +2,6 @@ import { AppHeader } from "@/components/layout/app-header";
 import { PortfolioOverview } from "@/components/portfolio/portfolio-overview";
 import { PortfolioTokens } from "@/components/portfolio/portfolio-tokens";
 import { PortfolioTransactions } from "@/components/portfolio/portfolio-transactions";
-import { Footer } from "@/components/layout/footer";
 
 export default function PortfolioPage() {
   return (

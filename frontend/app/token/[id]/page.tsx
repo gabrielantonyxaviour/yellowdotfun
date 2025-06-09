@@ -1,6 +1,4 @@
-import { AppHeader } from "@/components/layout/app-header";
 import { TokenDetail } from "@/components/token-detail/token-detail";
-import { Footer } from "@/components/layout/footer";
 
 export default function TokenPage({ params }: { params: { id: string } }) {
   return (

@@ -126,7 +126,7 @@ export function TradingPanel({ token }: TradingPanelProps) {
         <TabsContent value="buy" className="space-y-4">
           <div>
             <Label htmlFor="buy-amount" className="font-bold text-white">
-              Amount (ETH)
+              Amount (USD)
             </Label>
             <Input
               id="buy-amount"

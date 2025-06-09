@@ -1,46 +1,40 @@
-// app/api/tokens/route.ts
-import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-interface CreateTokenRequest {
-  token_name: string;
-  token_symbol: string;
-  token_image?: string;
-  creator_allocation?: number;
-  liquidity_amount: number;
-  twitter?: string;
-  telegram?: string;
-  website?: string;
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+);
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body: CreateTokenRequest = await request.json();
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const sortBy = searchParams.get("sortBy") || "created_at";
+    const order = searchParams.get("order") || "desc";
 
     const { data, error } = await supabase
       .from("tokens")
-      .insert({
-        token_name: body.token_name,
-        token_symbol: body.token_symbol,
-        token_image: body.token_image,
-        creator_allocation: body.creator_allocation || 0,
-        liquidity_amount: body.liquidity_amount,
-        twitter: body.twitter,
-        telegram: body.telegram,
-        website: body.website,
-      })
-      .select()
-      .single();
+      .select(
+        `
+        *,
+        token_market_data (
+          current_supply,
+          current_price_usd,
+          market_cap_usd,
+          volume_24h,
+          graduated_to_dex
+        )
+      `
+      )
+      .order(sortBy, { ascending: order === "asc" })
+      .range(offset, offset + limit - 1);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+    if (error) throw error;
 
-    return NextResponse.json(data, { status: 201 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ success: true, data });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

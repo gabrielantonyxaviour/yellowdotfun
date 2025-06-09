@@ -1,5 +1,3 @@
-import { AppHeader } from "@/components/layout/app-header";
-import { Footer } from "@/components/layout/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PrivacyPolicyPage() {
