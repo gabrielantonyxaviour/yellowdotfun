@@ -258,7 +258,7 @@ export const useNitrolite = (
         chainId: flowMainnet.id,
         addresses: {
           custody: "0x6258dCa1DF894980a8778197c60893a9fa2b5eF8",
-          guestAddress: "0x0429A2Da7884CA14E53142988D5845952fE4DF6a",
+          guestAddress: "0x3c93C321634a80FB3657CFAC707718A11cA57cBf",
           tokenAddress: "0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED",
           adjudicator: "0xEd44dba5ECB7928032649EF0075258FA3aca508B",
         },
@@ -273,7 +273,7 @@ export const useNitrolite = (
           chainId: flowMainnet.id,
           addresses: {
             custody: "0x6258dCa1DF894980a8778197c60893a9fa2b5eF8",
-            guestAddress: "0x0429A2Da7884CA14E53142988D5845952fE4DF6a",
+            guestAddress: "0x3c93C321634a80FB3657CFAC707718A11cA57cBf",
             tokenAddress: "0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED",
             adjudicator: "0xEd44dba5ECB7928032649EF0075258FA3aca508B",
           },
