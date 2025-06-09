@@ -317,17 +317,18 @@ export const useNitrolite = (
         };
       }
 
-      const { txHash } = await nitroliteClient.createChannel({
-        initialAllocationAmounts: [BigInt(amount), BigInt(0)],
-        stateData: "0x",
-      });
+      const { depositTxHash, createChannelTxHash } =
+        await nitroliteClient.depositAndCreateChannel(BigInt(amount), {
+          initialAllocationAmounts: [BigInt(amount), BigInt(0)],
+          stateData: "0x",
+        });
 
       console.log("Channel created");
-      console.log("Deposit tx hash:", txHash);
-      console.log("Create channel tx hash:", txHash);
+      console.log("Deposit tx hash:", depositTxHash);
+      console.log("Create channel tx hash:", createChannelTxHash);
       return {
-        depositTxHash: txHash,
-        createChannelTxHash: txHash,
+        depositTxHash: depositTxHash,
+        createChannelTxHash: createChannelTxHash,
       };
     },
 
